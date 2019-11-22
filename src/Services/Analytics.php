@@ -1,6 +1,6 @@
 <?php
 
-namespace WebEtDesign\CmsBundle\Services;
+namespace WebEtDesign\AnalyticsBundle\Services;
 
 use DateTime;
 use Google_Client;

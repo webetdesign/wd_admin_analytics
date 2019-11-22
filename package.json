@@ -21,10 +21,8 @@
     "webpack-dashboard": "^1.0.2"
   },
   "dependencies": {
-    "@shopify/draggable": "^1.0.0-beta.8",
     "chart.js": "^2.8.0",
-    "javascript-api-utils": "github:googleanalytics/javascript-api-utils#0.6.0",
-    "jquery": "^3.3.1",
-    "jquery-ui": "^1.12.1",
+    "extract-text-webpack-plugin": "^3.0.2",
+    "javascript-api-utils": "github:googleanalytics/javascript-api-utils#0.6.0"
   }
 }

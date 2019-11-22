@@ -20,8 +20,17 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('wd_admin_analytics');
-        
 
+        $rootNode
+            ->children()
+                ->arrayNode('parameters')->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('param1')->defaultValue(false)->end()
+                        ->scalarNode('param2')->defaultValue(false)->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
         return $treeBuilder;
     }
 }

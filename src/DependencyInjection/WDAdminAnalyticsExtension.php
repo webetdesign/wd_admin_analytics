@@ -1,6 +1,6 @@
 <?php
 
-namespace WebEtDesign\CmsBundle\DependencyInjection;
+namespace WebEtDesign\AnalyticsBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\Config\Definition\Processor;
@@ -18,6 +18,11 @@ class WDAdminAnalyticsExtension extends Extension
 
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yaml');
+    }
+
+    public function getAlias()
+    {
+        return 'wd_admin_analytics';
     }
 
 }

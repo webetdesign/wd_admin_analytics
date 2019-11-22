@@ -6,7 +6,7 @@
  * Time: 16:38
  */
 
-namespace WebEtDesign\CmsBundle\Block\Analytics;
+namespace WebEtDesign\AnalyticsBundle\Block;
 
 use Sonata\BlockBundle\Block\AbstractBlockService;
 
@@ -14,7 +14,7 @@ use Sonata\BlockBundle\Block\BlockContextInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use WebEtDesign\CmsBundle\Services\Analytics;
+use WebEtDesign\AnalyticsBundle\Services\Analytics;
 
 class Base extends AbstractBlockService
 {
@@ -53,14 +53,14 @@ class Base extends AbstractBlockService
             $start = sizeof($block[$block_name]) == 2 ? $block[$block_name][1] : null;
             $method = "get" . ucfirst($block_name);
             $row = [];
-            $row["template"] = "@WebEtDesignCms/block/analytics/" . $block_name . ".html.twig";
+            $row["template"] = "@WDAdminAnalytics/" . $block_name . ".html.twig";
             $start ? $row["data"] = $this->analyticsService->$method($start) : $row["data"] = $this->analyticsService->$method();
             $row["name"] = $block_name;
             $row["size"] = $block[$block_name] ? $block[$block_name][0] : null;
             $blocks[] = $row;
         }
 
-        return $this->renderPrivateResponse("@WebEtDesignCms/block/analytics/base.html.twig", [
+        return $this->renderPrivateResponse("@WDAdminAnalytics/base.html.twig", [
             'map_key' => $settings['map_key'] ,
             'map_color' => $settings['map_color'],
             'users_color' => $settings['users_color'],

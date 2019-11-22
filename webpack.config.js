@@ -19,7 +19,7 @@ const config = {
   entry: path.resolve('./assets/js/app.js'),
   output: {
     path: path.resolve('./src/Resources/public'),
-    filename: 'cms_admin.js',
+    filename: 'admin_analytics.js',
   },
   devtool: setDevTool(),
   module: {
@@ -41,7 +41,7 @@ const config = {
     ]
   },
   plugins: [
-    new ExtractTextWebpackPlugin("cms_admin.css")
+    new ExtractTextWebpackPlugin("admin_analytics.css")
   ]
 };
 
