@@ -23,16 +23,19 @@ class Base extends AbstractBlockService
      */
     private $analyticsService;
 
+    private $mapKey;
+
     /**
      * @param string $name
      * @param EngineInterface $templating
      * @param Analytics $analyticsService
      */
-    public function __construct($name, EngineInterface $templating, Analytics $analyticsService)
+    public function __construct($name, EngineInterface $templating, Analytics $analyticsService, $mapKey)
     {
         parent::__construct($name, $templating);
 
         $this->analyticsService = $analyticsService;
+        $this->mapKey = $mapKey;
     }
 
     /**
@@ -61,7 +64,7 @@ class Base extends AbstractBlockService
         }
 
         return $this->renderPrivateResponse("@WDAdminAnalytics/base.html.twig", [
-            'map_key' => $settings['map_key'] ,
+            'map_key' => $this->mapKey,
             'map_color' => $settings['map_color'],
             'users_color' => $settings['users_color'],
             'week_colors' => json_encode($settings['week_colors']),

@@ -5,6 +5,7 @@ services:
       - ~
       - '@templating'
       - '@analytics_api.service'
+      - '%wd_admin_analytics.map_key%'
     tags:
       - { name: sonata.block }
   analytics_api.api:
@@ -17,4 +18,4 @@ services:
     class: WebEtDesign\AnalyticsBundle\Services\Analytics
     arguments:
       - '@analytics_api.api'
-      - '%env(resolve:GOOGLE_ANALYTICS_VIEW_ID)%'
+      - '%wd_admin_analytics.view_id%'

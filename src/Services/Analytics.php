@@ -28,7 +28,7 @@ class Analytics
     /**
      * @var Google_Service_AnalyticsReporting
      */
-    private $analytics;
+    private $analyticsReport;
 
     /**
      * @var Google_Client
@@ -48,11 +48,11 @@ class Analytics
     public function __construct(GoogleAnalyticsService $analyticsService, $viewId, int $maxPage = 10)
     {
         $this->analyticsService = $analyticsService;
-        $this->viewId = $viewId;
+        $this->viewId = strval($viewId);
         $this->client = $analyticsService->getClient();
-        $this->analytics = new Google_Service_AnalyticsReporting($this->client);
-
+        $this->analyticsReport = new Google_Service_AnalyticsReporting($this->client);
         $this->maxPage = $maxPage;
+
     }
 
     /**
@@ -329,7 +329,7 @@ class Analytics
 
         $body = new Google_Service_AnalyticsReporting_GetReportsRequest();
         $body->setReportRequests( array( $request) );
-        $response = $this->analytics->reports->batchGet( $body );
+        $response = $this->analyticsReport->reports->batchGet( $body );
 
         return $this->$method($response);
     }
