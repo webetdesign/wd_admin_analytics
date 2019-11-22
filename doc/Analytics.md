@@ -5,6 +5,20 @@
 2° Add this line to config/Bundles.php file : 
        
         MediaFigaro\GoogleAnalyticsApi\GoogleAnalyticsApi::class => ['all' => true],
+3° Create File wd_admin_analtyics.yaml : 
+
+        wd_admin_analytics:
+              parameters:
+                     view_id: 000000000
+                     map_key: your-map-key
+                     
+        // 000000000 = profile id that you can find in the analytics URL, p000000000 :
+        //https://analytics.google.com/analytics/web/?hl=en&pli=1#management/Settings/a222222222w1111111111p000000000/   
+        
+ map_key use for Countries Chart "your-key" 
+         [Get Api Key](https://developers.google.com/maps/documentation/javascript/get-api-key#step-1-get-an-api-key), 
+         [Enable Api Key](https://cloud.google.com/maps-platform/#get-started)
+
 ## Configure API : 
 
    1°  You need a json file to access the API. Follow [this documentation](https://developers.google.com/analytics/devguides/reporting/core/v4/quickstart/service-php)
@@ -18,16 +32,9 @@
             
    4° Create ENV variable with the path of your JSON file :
         
-        GOOGLE_ANALYTICS_JSON_KEY=../var/analytics-259608.json
-   
-   5° Create ENV variable with the Wiew id of the project : 
+        GOOGLE_ANALYTICS_JSON_KEY=../var/analytics-259608.json        
         
-        GOOGLE_ANALYTICS_VIEW_ID=000000000
-        
-        // 000000000 = profile id that you can find in the analytics URL, p000000000 :
-        //https://analytics.google.com/analytics/web/?hl=en&pli=1#management/Settings/a222222222w1111111111p000000000/ 
-
-   6° In the json file, copy the client_email and add it to the granted users of you analytics account
+   5° In the json file, copy the client_email and add it to the granted users of you analytics account
         
         https://analytics.google.com/analytics/web/#/
             -> Administration
@@ -61,7 +68,6 @@ You can make different analytics blocks :
                    year_colors: ["rgb(160, 225, 255)", "rgb(000, 150, 220)"]
                    users_color: 'rgb(000, 123, 255)'
                    map_color: '#0077ae'
-                   map_key: "your_key"
 
    
 ###Configuration of a block
@@ -87,10 +93,6 @@ You can't configure the beginning of the data period for userYeek and userYear.
    - map_color => Percent of this color is use for Countries Chart, one Hexa color. 
                   Only this color have to be in hexa format `'#0077ae'`
    
-   - map_key => Map API key to use Countries Chart "your-key" 
-                [Get Api Key](https://developers.google.com/maps/documentation/javascript/get-api-key#step-1-get-an-api-key), 
-                [Enable Api Key](https://cloud.google.com/maps-platform/#get-started)
-
 ####The colors must be in rgb format :
    
     rgb(000, 123, 255)
