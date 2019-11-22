@@ -1,0 +1,41 @@
+{% for block in blocks %}
+    <div id="block-{{ block.name }}" class="{{ block.size | default('col-md-6') }}" >
+        {% include block.template with block.data %}
+    </div>
+    <div id="data-{{ block.name }}" style="display: none;" data-values="{{ block.data | json_encode }}">
+    </div>
+
+{% endfor %}
+
+
+
+{% if colors is defined %}
+    <div id="colors" style="display: none;" data-colors="{{ colors }}">
+    </div>
+{% endif %}
+
+{% if week_colors is defined %}
+    <div id="week_colors" style="display: none;" data-weekcolors="{{ week_colors }}">
+    </div>
+{% endif %}
+
+{% if year_colors is defined %}
+    <div id="year_colors" style="display: none;" data-yearcolors="{{ year_colors }}">
+    </div>
+{% endif %}
+
+{% if map_key is defined %}
+    <div id="map_key" style="display: none;" data-mapkey="{{ map_key }}">
+    </div>
+{% endif %}
+
+{% if users_color is defined %}
+    <div id="users_color" style="display: none;" data-userscolor="{{ users_color }}">
+    </div>
+{% endif %}
+
+{% if map_color is defined %}
+    <div id="map_color" style="display: none;" data-mapcolor="{{ map_color }}">
+    </div>
+{% endif %}
+
