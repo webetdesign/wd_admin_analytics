@@ -1,11 +1,17 @@
+## Install the Bundle :
+
+       // composer.json
+       
+       webetdesign/wd_admin_analytics: "1.0.1"
 ## Configure Bundle : 
 
 1° Update composer
 
-2° Add this line to config/Bundles.php file : 
-       
+2° Add this lines to config/Bundles.php file : 
+        
+        WebEtDesign\AnalyticsBundle\WDAdminAnalyticsBundle::class => ['all' => true],
         MediaFigaro\GoogleAnalyticsApi\GoogleAnalyticsApi::class => ['all' => true],
-3° Create File wd_admin_analtyics.yaml : 
+3° Create File wd_admin_analytics.yaml : 
 
         wd_admin_analytics:
               parameters:
