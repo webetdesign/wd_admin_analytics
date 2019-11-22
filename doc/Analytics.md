@@ -31,7 +31,7 @@
    
    2 ° When you have your json file. Save it in var dir of the project.
    
-   3° Rename the google_clientApi.yaml file to google-analytics-api and replace content by : 
+   3° Rename the google_apiclient.yaml file to google-analytics-api and replace content by : 
         
         google_analytics_api:
             google_analytics_json_key: "%env(resolve:GOOGLE_ANALYTICS_JSON_KEY)%"
@@ -46,7 +46,23 @@
             -> Administration
             -> Gestion des Utilisateurs
             -> +
-            
+## Enable Styles :    
+
+Execute :
+
+    bin/console assets:install --symlink
+    
+Add to file sonata_admin.yaml:
+
+    // sonata_admin.yaml
+    assets:
+        extra_javascripts:
+            [...]
+            - bundles/wdadminanalytics/admin_analytics.js
+        extra_stylesheets:
+            [...]
+            - bundles/wdadminanalytics/admin_analytics.js
+       
 ## Data :            
 You can make different analytics blocks :
 
