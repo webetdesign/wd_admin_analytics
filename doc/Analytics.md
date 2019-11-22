@@ -92,8 +92,8 @@ You can make different analytics blocks :
                    map_color: '#0077ae'
 
    
-###Configuration of a block
-
+### Configuration of a block
+ 
 To display a analytics block add it in analytics list like 'devices'
     
    - Fist parameter is the size. Default is col-12. You have to use [bootstrap grid class](https://getbootstrap.com/docs/4.0/layout/grid/)
@@ -101,9 +101,9 @@ To display a analytics block add it in analytics list like 'devices'
 
 You can't configure the beginning of the data period for userYeek and userYear.
 
-###General Parameters
+### General Parameters
 
-   - colors => Colors for Doughnut Chart, array of rgb colors : 
+   - colors => Colors for Doughnut Chart, array of rgb colors (nb color = nb result return for devices/sources/browsers) : 
     `["rgb(160, 225, 255)", "rgb(000, 150, 220)""rgb(195, 236, 255)","rgb(160, 225, 255)"]`
    - week_colors => Colors for UserYeek Chart, array 2 of rgb colors. First is for last week data and second for this week data
     
@@ -115,7 +115,7 @@ You can't configure the beginning of the data period for userYeek and userYear.
    - map_color => Percent of this color is use for Countries Chart, one Hexa color. 
                   Only this color have to be in hexa format `'#0077ae'`
    
-####The colors must be in rgb format :
+#### The colors must be in rgb format :
    
     rgb(000, 123, 255)
     
