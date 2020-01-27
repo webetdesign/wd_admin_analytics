@@ -20,7 +20,7 @@
 
 {% for block in blocks %}
     <div id="block-{{ block.name }}" class="{{ block.size | default('col-md-6') }} col-xs-12" >
-        {% include block.template with block.data %}
+        {% include block.template with {icon : block.icon} %}
     </div>
 
     {% for key, site in block.data %}

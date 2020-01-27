@@ -1,26 +1,44 @@
 ## Install the Bundle :
+```json
+{
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/webetdesign/wd_admin_analytics.git"
+        }
+    ],
+}
+```
+```json
+{
+  "require": {
+    webetdesign/wd_admin_analytics: "^1.0"
+  }
+}
+```
 
-       // composer.json
-       
-       webetdesign/wd_admin_analytics: "1.0.2"
 ## Configure Bundle : 
 
 1° Update composer
 
 2° Add this lines to config/Bundles.php file : 
-        
-        WebEtDesign\AnalyticsBundle\WDAdminAnalyticsBundle::class => ['all' => true],
-        MediaFigaro\GoogleAnalyticsApi\GoogleAnalyticsApi::class => ['all' => true],
+```php
+    ...
+    WebEtDesign\AnalyticsBundle\WDAdminAnalyticsBundle::class => ['all' => true],
+    MediaFigaro\GoogleAnalyticsApi\GoogleAnalyticsApi::class => ['all' => true],
+    ...
+```
 3° Create File wd_admin_analytics.yaml : 
-
+```yaml
         wd_admin_analytics:
               parameters:
                      view_ids: [000000000]
                      view_names: ['name']
                      map_key: your-map-key
                      
-        // 000000000 = profile id that you can find in the analytics URL, p000000000 :
-        //https://analytics.google.com/analytics/web/?hl=en&pli=1#management/Settings/a222222222w1111111111p000000000/   
+        # 000000000 = profile id that you can find in the analytics URL, p000000000 :
+        #https://analytics.google.com/analytics/web/?hl=en&pli=1#management/Settings/a222222222w1111111111p000000000/   
+```
         
  map_key use for Countries Chart "your-key" 
          [Get Api Key](https://developers.google.com/maps/documentation/javascript/get-api-key#step-1-get-an-api-key), 
@@ -33,14 +51,14 @@
    2 ° When you have your json file. Save it in var dir of the project.
    
    3° Rename the google_apiclient.yaml file to google-analytics-api and replace content by : 
-        
-        google_analytics_api:
-            google_analytics_json_key: "%env(resolve:GOOGLE_ANALYTICS_JSON_KEY)%"
-            
+```yaml
+    google_analytics_api:
+        google_analytics_json_key: "%env(resolve:GOOGLE_ANALYTICS_JSON_KEY)%"
+```            
    4° Create ENV variable with the path of your JSON file :
-        
-        GOOGLE_ANALYTICS_JSON_KEY=../var/analytics-259608.json        
-        
+```dotenv        
+   GOOGLE_ANALYTICS_JSON_KEY=../var/analytics-259608.json        
+```        
    5° In the json file, copy the client_email and add it to the granted users of you analytics account
         
         https://analytics.google.com/analytics/web/#/
@@ -54,7 +72,7 @@ Execute :
     bin/console assets:install --symlink
     
 Add to file sonata_admin.yaml:
-
+```yaml
     // sonata_admin.yaml
     assets:
         extra_javascripts:
@@ -62,8 +80,8 @@ Add to file sonata_admin.yaml:
             - bundles/wdadminanalytics/admin_analytics.js
         extra_stylesheets:
             [...]
-            - bundles/wdadminanalytics/admin_analytics.js
-       
+            - bundles/wdadminanalytics/admin_analytics.css
+```       
 ## Data :            
 You can make different analytics blocks :
 
@@ -75,8 +93,8 @@ You can make different analytics blocks :
    - **userWeek** : to display the difference in the number of visitors between this week and the previous
    - **userYear** : to display the difference in the number of visitors between this year and the previous
     
-    //sonata_admin.yaml
-    
+```yaml   
+#sonata_admin.yaml
     dashboard:
         blocks:
             -  class: col-12
@@ -85,21 +103,24 @@ You can make different analytics blocks :
                type:     cms.admin.analytics
                settings:
                    analytics:
-                       - devices: ["col-md-4", "2 months ago"]
+                       - devices:
+                             size: "col-md-6"
+                             icon: "fa-lg fa fa-mobile"
+                             start: "2 months ago"
                    colors: ["rgb(195, 236, 255)","rgb(160, 225, 255)", "rgb(114, 210, 255)", "rgb(063, 194, 255)", "rgb(000, 150, 220)", "rgb(000, 150, 174)"]
                    week_colors: ["rgb(160, 225, 255)", "rgb(000, 150, 220)"]
                    year_colors: ["rgb(160, 225, 255)", "rgb(000, 150, 220)"]
                    users_color: 'rgb(000, 123, 255)'
                    map_color: '#0077ae'
-
-   
+```   
 ### Configuration of a block
  
 To display a analytics block add it in analytics list like 'devices'
     
-   - Fist parameter is the size. Default is col-12. You have to use [bootstrap grid class](https://getbootstrap.com/docs/4.0/layout/grid/)
-   - Seconde paramater is the beginning of the data period. Default is 'first day of january this year'. [Use PHP Relative Formats](https://www.php.net/manual/fr/datetime.formats.relative.php)                       
-
+   - size : default is col-12. You have to use [bootstrap grid class](https://getbootstrap.com/docs/4.0/layout/grid/)
+   - start : beginning of the data period. Default is 'first day of january this year'. [Use PHP Relative Formats](https://www.php.net/manual/fr/datetime.formats.relative.php)                       
+   - icon : icon before title of the box. [fontawesome v4](https://fontawesome.com/v4.7.0/)
+   
 You can't configure the beginning of the data period for userYeek and userYear.
 
 ### General Parameters

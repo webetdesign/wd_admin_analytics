@@ -56,13 +56,18 @@ class Base extends AbstractBlockService
 
         foreach ($settings["analytics"] as $block) {
             $block_name = array_key_first($block);
-            $start = sizeof($block[$block_name]) == 2 ? $block[$block_name][1] : null;
+
+            $start = key_exists('start', $block[$block_name]) ? $block[$block_name]["start"] : null;
+            $icon = key_exists('icon', $block[$block_name]) ? $block[$block_name]["icon"] : null;
+            $size = key_exists('size', $block[$block_name]) ? $block[$block_name]["size"] : null;
+
             $method = "get" . ucfirst($block_name);
             $row = [];
             $row["template"] = "@WDAdminAnalytics/" . $block_name . ".html.twig";
             $start ? $row["data"] = $this->analyticsService->$method($start) : $row["data"] = $this->analyticsService->$method();
             $row["name"] = $block_name;
-            $row["size"] = $block[$block_name] ? $block[$block_name][0] : null;
+            $row["icon"] = $icon;
+            $row["size"] = $size;
             $blocks[] = $row;
         }
 
