@@ -19,7 +19,8 @@ class WDAdminAnalyticsExtension extends Extension
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yaml');
 
-        $container->setParameter('wd_admin_analytics.view_id', $config['parameters']['view_id']);
+        $container->setParameter('wd_admin_analytics.view_ids', $config['parameters']['view_ids']);
+        $container->setParameter('wd_admin_analytics.view_names', $config['parameters']['view_names']);
         $container->setParameter('wd_admin_analytics.map_key', $config['parameters']['map_key']);
 
     }

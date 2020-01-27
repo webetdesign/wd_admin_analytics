@@ -23,7 +23,10 @@ class Analytics
      */
     private $analyticsService;
 
-    private $viewId;
+    /**
+     * @var array
+     */
+    private $viewIds;
 
     /**
      * @var Google_Service_AnalyticsReporting
@@ -42,13 +45,13 @@ class Analytics
     /**
      * Analytics constructor.
      * @param GoogleAnalyticsService $analyticsService
-     * @param $viewId
+     * @param $ids
      * @param int $maxPage
      */
-    public function __construct(GoogleAnalyticsService $analyticsService, $viewId, int $maxPage = 10)
+    public function __construct(GoogleAnalyticsService $analyticsService, $ids, int $maxPage = 10)
     {
         $this->analyticsService = $analyticsService;
-        $this->viewId = strval($viewId);
+        $this->viewIds = $ids;
         $this->client = $analyticsService->getClient();
         $this->analyticsReport = new Google_Service_AnalyticsReporting($this->client);
         $this->maxPage = $maxPage;
@@ -121,13 +124,15 @@ class Analytics
         $response_this_week = $this->getDiffForWeek($response_this_week);
         $response_last_week = $this->getDiffForWeek($response_last_week);
 
-        $data = [
-            "labels" => ["Lun.", "Mar.", "Mer.", "Jeu.", "Ven.", "Sam.", "Dim."],
-            "values" => [
-                "last_week" => $response_last_week["values"],
-                "this_week" => $response_this_week["values"]
-            ]
-        ];
+        foreach ($response_this_week as $key => $row) {
+            $data[$key] = [
+                "labels" => ["Lun.", "Mar.", "Mer.", "Jeu.", "Ven.", "Sam.", "Dim."],
+                "values" => [
+                    "this_week" => $response_this_week[$key],
+                    "last_week" => $response_last_week[$key]
+                ]
+            ];
+        }
 
         return $data;
 
@@ -141,19 +146,22 @@ class Analytics
     private function getDiffForWeek($array){
         $previous = null;
         // append 0 in values array if days are missing because API not return days without session
-        foreach ($array['labels'] as $key => $item) {
-            if ($previous && date('d-m-Y', strtotime($previous . " 1 day") ) != date('d-m-Y', strtotime($item))){
+        foreach ($array as $row_key => $row){
+            foreach ($row['labels'] as $key => $item) {
+                if ($previous && date('d-m-Y', strtotime($previous . " 1 day") ) != date('d-m-Y', strtotime($item))){
 
-                $diff = abs(strtotime($previous) - strtotime($item));
-                $years = floor($diff / (365*60*60*24));
-                $months = floor(($diff - $years * 365*60*60*24) / (30*60*60*24));
-                $days = floor(($diff - $years * 365*60*60*24 - $months*30*60*60*24)/ (60*60*24)) - 1;
+                    $diff = abs(strtotime($previous) - strtotime($item));
+                    $years = floor($diff / (365*60*60*24));
+                    $months = floor(($diff - $years * 365*60*60*24) / (30*60*60*24));
+                    $days = floor(($diff - $years * 365*60*60*24 - $months*30*60*60*24)/ (60*60*24)) - 1;
 
-                for ($i = 0; $i < $days; $i++){
-                    array_splice($array['values'], $key, 0, 0);
+                    for ($i = 0; $i < $days; $i++){
+                        array_splice($row['values'], $key, 0, 0);
+                    }
                 }
+                $previous = $item;
             }
-            $previous = $item;
+            $array[$row_key] = $row["values"];
         }
         return $array;
     }
@@ -193,14 +201,15 @@ class Analytics
         $response_this_year = $this->getDiffForYear($response_this_year);
         $response_last_year = $this->getDiffForYear($response_last_year);
 
-        $data = [
-            "labels" => ['Jan.','Fev.','Mar.','Avr.','Mai.','Jui.', 'Juil.','Aou.','Sep.','Oct.','Nov.','Dec.'],
-            "values" => [
-                "last_year" => $response_last_year["values"],
-                "this_year" => $response_this_year["values"]
-            ]
-        ];
-
+        foreach ($response_this_year as $key => $row) {
+            $data[$key] = [
+                "labels" => ['Jan.','Fev.','Mar.','Avr.','Mai.','Jui.', 'Juil.','Aou.','Sep.','Oct.','Nov.','Dec.'],
+                "values" => [
+                    "last_year" => $response_last_year[$key],
+                    "this_year" => $response_this_year[$key]
+                ]
+            ];
+        }
         return $data;
     }
 
@@ -213,14 +222,17 @@ class Analytics
         $previous = "00";
 
         // append 0 in values array if days are missing because API not return days without session
-        foreach ($array['labels'] as $key => $item) {
-            if (intval($previous) + 1 != intval($item)){
-                $diff = intval($item) - intval($previous) - 1;
-                for ($i = 0; $i < $diff; $i++){
-                    array_splice($array['values'], $key, 0, 0);
+        foreach ($array as $row_key => $row){
+            foreach ($row['labels'] as $key => $item) {
+                if (intval($previous) + 1 != intval($item)) {
+                    $diff = intval($item) - intval($previous) - 1;
+                    for ($i = 0; $i < $diff; $i++) {
+                        array_splice($row['values'], $key, 0, 0);
+                    }
                 }
+                $previous = $item;
             }
-            $previous = $item;
+            $array[$row_key] = $row["values"];
         }
 
         return $array;
@@ -235,9 +247,12 @@ class Analytics
 
         $data = $this->getBasicChart( "users", "channelGrouping", $start);
 
-        foreach ($data["labels"] as $key => $label) {
-            if ($label == "(none)"){
-                $data["labels"][$key] = "Direct";
+        foreach ($data as $row_key => $row){
+            foreach ($row["labels"] as $key => $label) {
+                if ($label == "(none)"){
+                    $row["labels"][$key] = "Direct";
+                }
+                $data[$row_key] = $row;
             }
         }
         return $data;
@@ -252,17 +267,20 @@ class Analytics
 
         $data = $this->getBasicChart( "users", "deviceCategory", $start);
 
-        foreach ($data["labels"] as $key =>$label) {
-            switch (strtolower($label)) {
-                case 'mobile':
-                    $data["labels"][$key] = "Mobile";
-                    break;
-                case 'desktop':
-                    $data["labels"][$key] = "Ordinateur";
-                    break;
-                case 'tablet':
-                    $data["labels"][$key] = "Tablette";
-                    break;
+        foreach ($data as $row_key => $row) {
+            foreach ($row["labels"] as $key => $label) {
+                switch (strtolower($label)) {
+                    case 'mobile':
+                        $row["labels"][$key] = "Mobile";
+                        break;
+                    case 'desktop':
+                        $row["labels"][$key] = "Ordinateur";
+                        break;
+                    case 'tablet':
+                        $row["labels"][$key] = "Tablette";
+                        break;
+                }
+                $data[$row_key] = $row;
             }
         }
 
@@ -278,13 +296,18 @@ class Analytics
 
         $response = $this->getBasicChart( "users", "country", $start);
         $data = [];
-        $data[] = ['Country', 'Popularity'];
 
-        foreach ($response["labels"] as $key => $item) {
-            $data[] = [
-                $response["labels"][$key],
-                intval($response["values"][$key])
-            ];
+        foreach ($response as $row_key => $row) {
+
+            $data_row = [['Country', 'Popularity']];
+
+            foreach ($row["labels"] as $key => $item) {
+                $data_row[] = [
+                    $row["labels"][$key],
+                    intval($row["values"][$key])
+                ];
+            }
+            $data[$row_key] = $data_row;
         }
 
         return $data;
@@ -316,22 +339,29 @@ class Analytics
     }
 
     private function makeRequest(array $metrics, array $dimensions, array $dates, $method = "formatDataChart", $max = null){
-        // Create the ReportRequest object.
-        $request = new Google_Service_AnalyticsReporting_ReportRequest();
-        $request->setViewId($this->viewId);
-        $request->setMetrics($metrics);
-        $request->setDimensions($dimensions);
-        $request->setDateRanges($dates);
 
-        if ($max){
-            $request->setPageSize($max);
+        $data = [];
+        foreach ($this->viewIds as $id) {
+            // Create the ReportRequest object.
+            $request = new Google_Service_AnalyticsReporting_ReportRequest();
+            $request->setViewId(strval($id));
+            $request->setMetrics($metrics);
+            $request->setDimensions($dimensions);
+            $request->setDateRanges($dates);
+
+            if ($max){
+                $request->setPageSize($max);
+            }
+
+            $body = new Google_Service_AnalyticsReporting_GetReportsRequest();
+            $body->setReportRequests( array( $request) );
+            $response = $this->analyticsReport->reports->batchGet( $body );
+
+
+            $data[$id] = $this->$method($response);
         }
 
-        $body = new Google_Service_AnalyticsReporting_GetReportsRequest();
-        $body->setReportRequests( array( $request) );
-        $response = $this->analyticsReport->reports->batchGet( $body );
-
-        return $this->$method($response);
+        return $data;
     }
 
     private function formatDataChart(Google_Response $response)

@@ -25,17 +25,20 @@ class Base extends AbstractBlockService
 
     private $mapKey;
 
+    private $view_names;
+
     /**
      * @param string $name
      * @param EngineInterface $templating
      * @param Analytics $analyticsService
      */
-    public function __construct($name, EngineInterface $templating, Analytics $analyticsService, $mapKey)
+    public function __construct($name, EngineInterface $templating, Analytics $analyticsService, $mapKey, $names)
     {
         parent::__construct($name, $templating);
 
         $this->analyticsService = $analyticsService;
         $this->mapKey = $mapKey;
+        $this->view_names = $names;
     }
 
     /**
@@ -63,6 +66,7 @@ class Base extends AbstractBlockService
             $blocks[] = $row;
         }
 
+
         return $this->renderPrivateResponse("@WDAdminAnalytics/base.html.twig", [
             'map_key' => $this->mapKey,
             'map_color' => $settings['map_color'],
@@ -70,7 +74,8 @@ class Base extends AbstractBlockService
             'week_colors' => json_encode($settings['week_colors']),
             'year_colors' => json_encode($settings['year_colors']),
             'colors' => json_encode($settings['colors']),
-            'blocks' => $blocks
+            'blocks' => $blocks,
+            'view_names' => $this->view_names
         ], $response);
     }
 
@@ -91,8 +96,8 @@ class Base extends AbstractBlockService
             'week_colors' => ['rgb(255, 077, 077)', 'rgb(230, 000, 000)'],
             'year_colors' => ['rgb(255, 077, 077)', 'rgb(230, 000, 000)'],
             'colors' => ['rgb(255, 102, 102)','rgb(255, 051, 051)','rgb(230, 000, 000)','rgb(179, 000, 000)','rgb(128, 000, 000)'],
-            "analytics" => []
-
+            "analytics" => [],
+            "view_names" => []
         ]);
 
         $resolver->setAllowedTypes('map_key', ['string', 'null']);
@@ -102,6 +107,7 @@ class Base extends AbstractBlockService
         $resolver->setAllowedTypes('map_color', ['string', 'null']);
         $resolver->setAllowedTypes('colors', ['array', 'null']);
         $resolver->setAllowedTypes('analytics', ['array', 'null']);
+        $resolver->setAllowedTypes('view_names', ['array', 'null']);
 
 
     }

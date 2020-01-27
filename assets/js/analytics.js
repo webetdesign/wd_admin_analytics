@@ -2,7 +2,19 @@ import Chart from "chart.js"
 import './gapi.js';
 
 document.addEventListener('DOMContentLoaded', function(){
+    $('#select-website').on('change', function(){
+        loadData();
+    })
+    loadData();
+}, false);
+
+$(window).resize(function() {
+    loadData();
+})
+
+function loadData(){
     var colors = null;
+    var site_id = document.getElementById('select-website').selectedOptions[0].value;
 
     if ( document.getElementById("colors")){
         colors = document.getElementById("colors").dataset.colors;
@@ -10,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 
     if (document.getElementById("browsers-container") != null){
-        var browsers = document.getElementById("data-browsers").dataset.values;
+        var browsers = document.getElementById("data-browsers"  + '-' + site_id).dataset.values;
         renderDoughnut(JSON.parse(browsers), colors, "browsers");
     }
 
@@ -24,10 +36,9 @@ document.addEventListener('DOMContentLoaded', function(){
         if ( document.getElementById("week_colors") != null){
             week_colors = document.getElementById("week_colors").dataset.weekcolors;
             week_colors = JSON.parse(week_colors);
-            document.getElementById("week_colors").remove();
         }
 
-        var weeks = document.getElementById("data-userWeek").dataset.values;
+        var weeks = document.getElementById("data-userWeek" + '-' + site_id).dataset.values;
 
         renderWeekOverWeekChart(JSON.parse(weeks), week_colors);
     }
@@ -42,41 +53,45 @@ document.addEventListener('DOMContentLoaded', function(){
         if ( document.getElementById("year_colors") != null){
             year_colors = document.getElementById("year_colors").dataset.yearcolors;
             year_colors = JSON.parse(year_colors);
-            document.getElementById("year_colors").remove();
         }
 
-        var years = document.getElementById("data-userYear").dataset.values;
+        var years = document.getElementById("data-userYear" + '-' + site_id).dataset.values;
 
         renderYearOverYearChart(JSON.parse(years), year_colors);
     }
 
     if (document.getElementById("sources-container") != null){
-        var sources = document.getElementById("data-sources").dataset.values;
+        var sources = document.getElementById("data-sources" + '-' + site_id).dataset.values;
         renderDoughnut(JSON.parse(sources), colors, "sources");
     }
 
     if (document.getElementById("devices-container") != null){
-        var devices = document.getElementById("data-devices").dataset.values;
+        var devices = document.getElementById("data-devices" + '-' + site_id).dataset.values;
         renderDoughnut(JSON.parse(devices), colors, "devices");
     }
 
     if (document.getElementById("countries-container") != null){
-        var countries = document.getElementById("data-countries").dataset.values;
+        var countries = document.getElementById("data-countries" + '-' + site_id).dataset.values;
         var map = document.getElementById("map_key").dataset.mapkey;
         var map_color = document.getElementById("map_color").dataset.mapcolor;
-        document.getElementById("map_key").remove();
+
         renderCountries(JSON.parse(countries), map_color    , map);
     }
 
     if (document.getElementById("users-container") != null){
         var users_color = document.getElementById("users_color").dataset.userscolor;
-        var users = document.getElementById("data-users").dataset.values;
+        var users = document.getElementById("data-users" + '-' + site_id).dataset.values;
         renderUsers(JSON.parse(users), users_color, "users");
     }
-
-}, false);
+}
 
 function renderDoughnut(response, colors, name) {
+
+    if (response.labels.length === 0){
+        $('#' + name + '-container')[0].innerHTML = "<h4> Vous n'avez pas de données pour ce type d'analytics </h4>";
+        return;
+    };
+
     var data = [];
     var colors_chart = [];
     var values = [];
@@ -178,6 +193,7 @@ function renderCountries(data, color, mapKey){
 function renderUsers(data, color){
     var visits = data["values"];
     var max = data["max"];
+    $("#users-container")[0].innerHTML = "";
 
     $.each(visits, function(i, row) {
         var id = "row-" + i ;

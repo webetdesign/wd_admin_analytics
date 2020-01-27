@@ -15,7 +15,8 @@
 
         wd_admin_analytics:
               parameters:
-                     view_id: 000000000
+                     view_ids: [000000000]
+                     view_names: ['name']
                      map_key: your-map-key
                      
         // 000000000 = profile id that you can find in the analytics URL, p000000000 :

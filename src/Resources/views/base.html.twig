@@ -1,12 +1,33 @@
+<div id="block-select" class="col-xs-12 " style="{% if blocks[0].data | length == 1 %} display: none {% endif %}">
+    <div class="Chartjs  p-4 shadow bg-block-analytics box box-primary"  >
+        <div class="box-header text-center">
+            <h3>Sites </h3>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-xs-12 col-md-4">
+                    <select name="" id="select-website">
+                        {% for key, site in blocks[0].data %}
+                            <option value="{{ key }}">{{ view_names[loop.index - 1] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 {% for block in blocks %}
-    <div id="block-{{ block.name }}" class="{{ block.size | default('col-md-6') }}" >
+    <div id="block-{{ block.name }}" class="{{ block.size | default('col-md-6') }} col-xs-12" >
         {% include block.template with block.data %}
     </div>
-    <div id="data-{{ block.name }}" style="display: none;" data-values="{{ block.data | json_encode }}">
-    </div>
 
+    {% for key, site in block.data %}
+        <div id="data-{{ block.name }}-{{ key }}"  style="display: none;" data-values="{{ site | json_encode }}">
+        </div>
+    {% endfor %}
 {% endfor %}
-
 
 
 {% if colors is defined %}
