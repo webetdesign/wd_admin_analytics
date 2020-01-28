@@ -1,6 +1,9 @@
 <div class="Chartjs p-4 shadow bg-block-analytics box box-primary" >
-    <div class="box-header text-center">
-        <h3>Semaine dernière / Cette semaine </h3>
+    <div class="box-header box-header-analytics">
+        {% if icon is defined %}
+            <i class="{{ icon }}"></i>
+        {% endif %}
+        <h3 class="box-title ">Semaine dernière / Cette semaine </h3>
     </div>
     <div class="box-body">
         <figure class="Chartjs-figure" id="week-container"></figure>
