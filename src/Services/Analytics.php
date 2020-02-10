@@ -15,6 +15,7 @@ use Google_Service_AnalyticsReporting_ReportRequest;
 use Google_Service_AnalyticsReporting_ReportRow;
 use MediaFigaro\GoogleAnalyticsApi\Service\GoogleAnalyticsService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Google_Service_AnalyticsReporting_OrderBy;
 
 class Analytics
 {
@@ -65,7 +66,7 @@ class Analytics
      * @param string $end
      * @return array
      */
-    public function getBasicChart($metric_name, $dimension_name, $start, $end = "today"){
+    public function getBasicChart($metric_name, $dimension_name, $start, $end = "yesterday"){
         $dateRange = new Google_Service_AnalyticsReporting_DateRange();
         $dateRange->setStartDate(date('Y-m-d', strtotime($start)));
         $dateRange->setEndDate(date('Y-m-d', strtotime($end)));
@@ -77,7 +78,29 @@ class Analytics
         $dimension = new Google_Service_AnalyticsReporting_Dimension();
         $dimension->setName("ga:" . $dimension_name);
 
-        return $this->makeRequest([$metric], [$dimension], [$dateRange], "formatDataChart",$this->maxPage);
+        $actual = $this->makeRequest([$metric], [$dimension], [$dateRange], "formatDataChart",$this->maxPage);
+
+        $dateRange = new Google_Service_AnalyticsReporting_DateRange();
+        $dateRange->setStartDate(
+            date('Y-m-d', strtotime(date('Y-m-d', strtotime($start)). $start))
+        );
+        $dateRange->setEndDate(date('Y-m-d', strtotime(date('Y-m-d', strtotime($start)). ' -1 day')));
+
+        $history = $this->makeRequest([$metric], [$dimension], [$dateRange], "formatDataChart",$this->maxPage);
+
+        foreach ($actual as $siteId => $fields) {
+            foreach ($fields['labels'] as $key => $item) {
+                if (!in_array($item, $history[$siteId]['labels'])){
+                    return $actual;
+                }else{
+                    $id = array_search($item, $history[$siteId]['labels']);
+                    $actual[$siteId]['diff'][$key] = $actual[$siteId]['percents'][$key] - $history[$siteId]['percents'][$id];
+                }
+            }
+
+        }
+
+        return $actual;
     }
 
     /**
@@ -86,7 +109,15 @@ class Analytics
      * @return array
      */
     public function getBrowsers($start = "30 days ago"){
-        return $this->getBasicChart( "users", "browser", $start);
+        $data = $this->getBasicChart( "users", "browser", $start);
+
+        foreach ($data as $row_key => $row){
+            foreach ($row["labels"] as $key => $label) {
+                $row["labels"][$key] = [$label, null];
+                $data[$row_key] = $row;
+            }
+        }
+        return $data;
     }
 
     /**
@@ -97,16 +128,16 @@ class Analytics
      */
     public function getUserWeek(){
         $thisWeek = new Google_Service_AnalyticsReporting_DateRange();
-        // this monday
-        $thisWeek->setStartDate(date('Y-m-d', strtotime('this week')));
+        // week - 1
+        $thisWeek->setStartDate(date('Y-m-d', strtotime('-7 days')));
         // today
-        $thisWeek->setEndDate(date('Y-m-d'));
+        $thisWeek->setEndDate(date('Y-m-d', strtotime('-1 days')));
 
         $lastWeek = new Google_Service_AnalyticsReporting_DateRange();
-        // last monday
-        $lastWeek->setStartDate(date('Y-m-d', strtotime('last week')));
-        //last sunday
-        $lastWeek->setEndDate(date('Y-m-d', strtotime('sunday this week')));
+        // week - 2
+        $lastWeek->setStartDate(date('Y-m-d', strtotime('-14 days')));
+        // week - 1
+        $lastWeek->setEndDate(date('Y-m-d', strtotime('-8 days')));
 
         $metric = new Google_Service_AnalyticsReporting_Metric();
         $metric->setExpression("ga:users");
@@ -126,7 +157,7 @@ class Analytics
 
         foreach ($response_this_week as $key => $row) {
             $data[$key] = [
-                "labels" => ["Lun.", "Mar.", "Mer.", "Jeu.", "Ven.", "Sam.", "Dim."],
+                "labels" => $this->getLabelsWeek(),
                 "values" => [
                     "this_week" => $response_this_week[$key],
                     "last_week" => $response_last_week[$key]
@@ -136,6 +167,26 @@ class Analytics
 
         return $data;
 
+    }
+
+    /**
+     * @return array
+     */
+    private function getLabelsWeek(){
+        $days = ["Lun.", "Mar.", "Mer.", "Jeu.", "Ven.", "Sam.", "Dim."];
+        $labels = [];
+
+        for($i = date('N', strtotime('now')); $i < 8; $i++){
+            array_push($labels, $days[$i - 1]);
+        }
+
+        $i = 0;
+        while(count($labels) != count($days)){
+            array_push($labels, $days[$i]);
+            $i++;
+        }
+
+        return $labels;
     }
 
     /**
@@ -250,7 +301,10 @@ class Analytics
         foreach ($data as $row_key => $row){
             foreach ($row["labels"] as $key => $label) {
                 if ($label == "(none)"){
-                    $row["labels"][$key] = "Direct";
+                    $row["labels"][$key] = ["Direct", null];
+                }else{
+                    $row["labels"][$key] = [$label, null];
+
                 }
                 $data[$row_key] = $row;
             }
@@ -265,19 +319,19 @@ class Analytics
      */
     public function getDevices($start = "30 days ago"){
 
-        $data = $this->getBasicChart( "users", "deviceCategory", $start);
+        $data = $this->getBasicChart( "visits", "deviceCategory", $start);
 
         foreach ($data as $row_key => $row) {
             foreach ($row["labels"] as $key => $label) {
                 switch (strtolower($label)) {
                     case 'mobile':
-                        $row["labels"][$key] = "Mobile";
+                        $row["labels"][$key] = ['Mobile', 'fa-4x fa fa-mobile'];
                         break;
                     case 'desktop':
-                        $row["labels"][$key] = "Ordinateur";
+                        $row["labels"][$key] = ["Ordinateur", 'fa fa-desktop fa-4x'];
                         break;
                     case 'tablet':
-                        $row["labels"][$key] = "Tablette";
+                        $row["labels"][$key] = ["Tablette", 'fa-lg fa fa-tablet fa-4x fa-rotate-90'];
                         break;
                 }
                 $data[$row_key] = $row;
@@ -349,6 +403,14 @@ class Analytics
             $request->setDimensions($dimensions);
             $request->setDateRanges($dates);
 
+            if (count($metrics) == 1){
+                $order = new Google_Service_AnalyticsReporting_OrderBy();
+                $order->setFieldName( $metrics[0]->getExpression());
+                $order->setOrderType("VALUE");
+                $order->setSortOrder("DESCENDING");
+                $request->setOrderBys($order);
+            }
+
             if ($max){
                 $request->setPageSize($max);
             }
@@ -356,7 +418,6 @@ class Analytics
             $body = new Google_Service_AnalyticsReporting_GetReportsRequest();
             $body->setReportRequests( array( $request) );
             $response = $this->analyticsReport->reports->batchGet( $body );
-
 
             $data[$id] = $this->$method($response);
         }
@@ -366,20 +427,30 @@ class Analytics
 
     private function formatDataChart(Google_Response $response)
     {
+
         $data = [
             "labels" => [],
-            "values" => []
+            "values" => [],
+            "total" => 0,
+            'percents' => [],
+            'diff' => []
         ];
 
         /** @var Google_Report $report */
         foreach ($response->getReports() as $report) {
             /** @var Google_Service_AnalyticsReporting_ReportRow $row */
+            $data["total"] = $report->getData()->getTotals()[0]->getValues()[0];
             foreach ($report->getData()->getRows() as $row) {
-                array_push($data["values"], $row->getMetrics()[0]->getValues()[0]);
+                $value = $row->getMetrics()[0]->getValues()[0];
+                $prct = round(intval($value) / intval($data['total']), 4) * 100;
+
+                array_push($data["values"], $value);
+                array_push($data["percents"], $prct);
                 array_push($data["labels"], ucfirst($row->getDimensions()[0]));
             }
 
         }
+
         return $data;
     }
 

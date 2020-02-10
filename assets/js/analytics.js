@@ -1,5 +1,5 @@
 import Chart from "chart.js"
-import './gapi.js';
+// import './gapi.js';
 
 document.addEventListener('DOMContentLoaded', function(){
     $('#select-website').on('change', function(){
@@ -110,14 +110,67 @@ function renderDoughnut(response, colors, name) {
     });
 
     data['labels'] =  labels;
+    data['diff'] =  response.diff;
+    data['percents'] =  response.percents;
+    data['total'] =  response.total[0];
 
 
     var chart = new Chart(makeCanvas(name + '-container'), {
         type: 'doughnut',
         data: data,
-        options: {}
+        options: {
+            cutoutPercentage: 70,
+            legend: false,
+            tooltips: {
+                callbacks: {
+                    label: function(tooltipItem, data) {
+                        var label = data.labels[tooltipItem.index][0];
+
+                        if (label) {
+                            label += ': ';
+                        }
+                        label += data.datasets[0].data[tooltipItem.index]
+                        return label;
+                    }
+                }
+            },
+            legendCallback: function(chart) {
+                var legendHtml = [];
+                var item = chart.data.datasets[0];
+                legendHtml.push('<table style="margin-bottom: 5px; margin-top: 30px"><tr>')
+                for (var i=0; i < item.data.length; i++) {
+                    legendHtml.push('<td class="chart-legend" style="color:' + item.backgroundColor[i] +'"><i class="' + chart.data.labels[i][1] +'"></i></td>');
+                }
+                legendHtml.push('</tr>')
+
+                legendHtml.push('<tr>')
+                for (var i=0; i < item.data.length; i++) {
+                    legendHtml.push('<td class="chart-legend-label-text">' + chart.data.labels[i][0] +'</td>');
+                }
+                legendHtml.push('</tr>')
+
+                legendHtml.push('<tr>')
+                for (var i=0; i < item.data.length; i++) {
+                    var prct = parseFloat(chart.data.percents[i]).toFixed(2)
+                    legendHtml.push('<td class="chart-legend-label-text">' + prct +' %</td>');
+                }
+                legendHtml.push('</tr>')
+
+                legendHtml.push('<tr>')
+                for (var i=0; i < item.data.length; i++) {
+                    var prct = parseFloat(chart.data.diff[i]).toFixed(2)
+                    var css = prct >= 0 ? 'text-success' : 'text-danger';
+                    legendHtml.push('<td class="chart-legend-label-diff ' + css + ' ">' + prct +' %</td>');
+                }
+                legendHtml.push('</tr>')
+
+                legendHtml.push('</table>')
+                return legendHtml.join("");
+            }
+        },
     });
 
+    $('#' + name + '-legend').html(chart.generateLegend());
 }
 
 function renderWeekOverWeekChart(data, colors) {
@@ -129,15 +182,16 @@ function renderWeekOverWeekChart(data, colors) {
                 label: 'Semaine dernière',
                 borderColor : colors[0],
                 pointColor : colors[0],
-                backgroundColor: (colors[0]).substring(0,17) + ", 0.5)",
+                backgroundColor: "rgb(255, 255, 255, 0)",
+                borderDash: [10, 8],
                 pointStrokeColor : '#fff',
                 data :  data.values.last_week
             },
             {
                 label: 'Cette semaine',
                 borderColor : colors[1],
+                backgroundColor: "rgb(255, 255, 255, 0)",
                 pointColor : colors[1],
-                backgroundColor: (colors[1]).substring(0,17) + ", 0.5)",
                 pointStrokeColor : '#fff',
                 data : data.values.this_week
             }

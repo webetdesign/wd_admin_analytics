@@ -187,6 +187,17 @@ limitations under the License.
     margin-right: var(--gap);
   }
 }
+
+.doughnut-legend{
+  text-align: center;
+}
+.doughnut-legend .chart-legend-label-text{
+  font-size: 15px;
+}
+
+.doughnut-legend .chart-legend-label-diff{
+  font-size: 13px;
+}
 /*
 Copyright 2016 Google Inc. All rights reserved.
 
@@ -211,3 +222,6 @@ limitations under the License.
 .box-header-analytics {
   padding-left: 0 !important;
   padding-top: 0 !important; }
+
+.doughnut-legend table {
+  width: 100%; }
