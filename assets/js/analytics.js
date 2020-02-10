@@ -70,6 +70,11 @@ function loadData(){
         renderDoughnut(JSON.parse(devices), colors, "devices");
     }
 
+    if (document.getElementById("pages-container") != null){
+        var pages = document.getElementById("data-pages" + '-' + site_id).dataset.values;
+        renderPages(JSON.parse(pages));
+    }
+
     if (document.getElementById("countries-container") != null){
         var countries = document.getElementById("data-countries" + '-' + site_id).dataset.values;
         var map = document.getElementById("map_key").dataset.mapkey;
@@ -282,6 +287,26 @@ function renderUsers(data, color){
     }
 
     $("[rel=tooltip]").tooltip({html:true});
+}
+
+function renderPages(data){
+    var container = $("#pages-container");
+
+    var html = '<table class="pages-table">';
+
+    html += '<tr><td></td><td>Vues</td></tr>'
+
+    for (let i = 0; i < data.labels.length; i++) {
+        html += '<tr>' +
+            '<td>' + data.labels[i] + '</td>' +
+            '<td>' + data.values[i] + '</td>' +
+            '</tr>';
+    }
+
+    html += '</table>';
+
+    container.html(html);
+
 }
 
 function getColorUser(max, value, color){

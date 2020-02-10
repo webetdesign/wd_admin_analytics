@@ -8,3 +8,23 @@
 .doughnut-legend table {
     width: 100%;
 }
+
+.pages-table{
+    width: 100%;
+
+    tr {
+        font-size: 15px;
+    }
+
+    & tr:not(:first-child){
+        border-top: 1px solid darkgray;
+    }
+
+    td {
+        padding: 2px 0;
+    }
+}
+
+#pages-container{
+    height: auto;
+}

@@ -52,11 +52,10 @@ class Analytics
     public function __construct(GoogleAnalyticsService $analyticsService, $ids, int $maxPage = 10)
     {
         $this->analyticsService = $analyticsService;
-        $this->viewIds = $ids;
-        $this->client = $analyticsService->getClient();
-        $this->analyticsReport = new Google_Service_AnalyticsReporting($this->client);
-        $this->maxPage = $maxPage;
-
+        $this->viewIds          = $ids;
+        $this->client           = $analyticsService->getClient();
+        $this->analyticsReport  = new Google_Service_AnalyticsReporting($this->client);
+        $this->maxPage          = $maxPage;
     }
 
     /**
@@ -66,7 +65,10 @@ class Analytics
      * @param string $end
      * @return array
      */
-    public function getBasicChart($metric_name, $dimension_name, $start, $end = "yesterday"){
+    public function getBasicChart($metric_name, $dimension_name, $start, $end = "yesterday", $max = null)
+    {
+        $max = $max ? $max : $this->maxPage;
+
         $dateRange = new Google_Service_AnalyticsReporting_DateRange();
         $dateRange->setStartDate(date('Y-m-d', strtotime($start)));
         $dateRange->setEndDate(date('Y-m-d', strtotime($end)));
@@ -78,26 +80,25 @@ class Analytics
         $dimension = new Google_Service_AnalyticsReporting_Dimension();
         $dimension->setName("ga:" . $dimension_name);
 
-        $actual = $this->makeRequest([$metric], [$dimension], [$dateRange], "formatDataChart",$this->maxPage);
+        $actual = $this->makeRequest([$metric], [$dimension], [$dateRange], "formatDataChart", $max);
 
         $dateRange = new Google_Service_AnalyticsReporting_DateRange();
         $dateRange->setStartDate(
-            date('Y-m-d', strtotime(date('Y-m-d', strtotime($start)). $start))
+            date('Y-m-d', strtotime(date('Y-m-d', strtotime($start)) . $start))
         );
-        $dateRange->setEndDate(date('Y-m-d', strtotime(date('Y-m-d', strtotime($start)). ' -1 day')));
+        $dateRange->setEndDate(date('Y-m-d', strtotime(date('Y-m-d', strtotime($start)) . ' -1 day')));
 
-        $history = $this->makeRequest([$metric], [$dimension], [$dateRange], "formatDataChart",$this->maxPage);
+        $history = $this->makeRequest([$metric], [$dimension], [$dateRange], "formatDataChart", $max);
 
         foreach ($actual as $siteId => $fields) {
             foreach ($fields['labels'] as $key => $item) {
-                if (!in_array($item, $history[$siteId]['labels'])){
+                if (!in_array($item, $history[$siteId]['labels'])) {
                     return $actual;
-                }else{
-                    $id = array_search($item, $history[$siteId]['labels']);
+                } else {
+                    $id                            = array_search($item, $history[$siteId]['labels']);
                     $actual[$siteId]['diff'][$key] = $actual[$siteId]['percents'][$key] - $history[$siteId]['percents'][$id];
                 }
             }
-
         }
 
         return $actual;
@@ -108,15 +109,17 @@ class Analytics
      * @param string $start
      * @return array
      */
-    public function getBrowsers($start = "30 days ago"){
-        $data = $this->getBasicChart( "users", "browser", $start);
+    public function getBrowsers($start = "30 days ago")
+    {
+        $data = $this->getBasicChart("users", "browser", $start);
 
-        foreach ($data as $row_key => $row){
+        foreach ($data as $row_key => $row) {
             foreach ($row["labels"] as $key => $label) {
                 $row["labels"][$key] = [$label, null];
-                $data[$row_key] = $row;
+                $data[$row_key]      = $row;
             }
         }
+
         return $data;
     }
 
@@ -126,7 +129,8 @@ class Analytics
      *      [monday -> sunday] last week
      * @return array
      */
-    public function getUserWeek(){
+    public function getUserWeek()
+    {
         $thisWeek = new Google_Service_AnalyticsReporting_DateRange();
         // week - 1
         $thisWeek->setStartDate(date('Y-m-d', strtotime('-7 days')));
@@ -166,22 +170,22 @@ class Analytics
         }
 
         return $data;
-
     }
 
     /**
      * @return array
      */
-    private function getLabelsWeek(){
-        $days = ["Lun.", "Mar.", "Mer.", "Jeu.", "Ven.", "Sam.", "Dim."];
+    private function getLabelsWeek()
+    {
+        $days   = ["Lun.", "Mar.", "Mer.", "Jeu.", "Ven.", "Sam.", "Dim."];
         $labels = [];
 
-        for($i = date('N', strtotime('now')); $i < 8; $i++){
+        for ($i = date('N', strtotime('now')); $i < 8; $i++) {
             array_push($labels, $days[$i - 1]);
         }
 
         $i = 0;
-        while(count($labels) != count($days)){
+        while (count($labels) != count($days)) {
             array_push($labels, $days[$i]);
             $i++;
         }
@@ -194,19 +198,19 @@ class Analytics
      * @param array $array
      * @return array
      */
-    private function getDiffForWeek($array){
+    private function getDiffForWeek($array)
+    {
         $previous = null;
         // append 0 in values array if days are missing because API not return days without session
-        foreach ($array as $row_key => $row){
+        foreach ($array as $row_key => $row) {
             foreach ($row['labels'] as $key => $item) {
-                if ($previous && date('d-m-Y', strtotime($previous . " 1 day") ) != date('d-m-Y', strtotime($item))){
+                if ($previous && date('d-m-Y', strtotime($previous . " 1 day")) != date('d-m-Y', strtotime($item))) {
+                    $diff   = abs(strtotime($previous) - strtotime($item));
+                    $years  = floor($diff / (365 * 60 * 60 * 24));
+                    $months = floor(($diff - $years * 365 * 60 * 60 * 24) / (30 * 60 * 60 * 24));
+                    $days   = floor(($diff - $years * 365 * 60 * 60 * 24 - $months * 30 * 60 * 60 * 24) / (60 * 60 * 24)) - 1;
 
-                    $diff = abs(strtotime($previous) - strtotime($item));
-                    $years = floor($diff / (365*60*60*24));
-                    $months = floor(($diff - $years * 365*60*60*24) / (30*60*60*24));
-                    $days = floor(($diff - $years * 365*60*60*24 - $months*30*60*60*24)/ (60*60*24)) - 1;
-
-                    for ($i = 0; $i < $days; $i++){
+                    for ($i = 0; $i < $days; $i++) {
                         array_splice($row['values'], $key, 0, 0);
                     }
                 }
@@ -214,6 +218,7 @@ class Analytics
             }
             $array[$row_key] = $row["values"];
         }
+
         return $array;
     }
 
@@ -223,7 +228,8 @@ class Analytics
      *      [january -> december] last year
      * @return array
      */
-    public function getUserYear(){
+    public function getUserYear()
+    {
         $thisYear = new Google_Service_AnalyticsReporting_DateRange();
         // this monday
         $thisYear->setStartDate(date('Y-m-d', strtotime('first day of january this year')));
@@ -254,13 +260,14 @@ class Analytics
 
         foreach ($response_this_year as $key => $row) {
             $data[$key] = [
-                "labels" => ['Jan.','Fev.','Mar.','Avr.','Mai.','Jui.', 'Juil.','Aou.','Sep.','Oct.','Nov.','Dec.'],
+                "labels" => ['Jan.', 'Fev.', 'Mar.', 'Avr.', 'Mai.', 'Jui.', 'Juil.', 'Aou.', 'Sep.', 'Oct.', 'Nov.', 'Dec.'],
                 "values" => [
                     "last_year" => $response_last_year[$key],
                     "this_year" => $response_this_year[$key]
                 ]
             ];
         }
+
         return $data;
     }
 
@@ -269,11 +276,12 @@ class Analytics
      * @param array $array
      * @return array
      */
-    private function getDiffForYear($array){
+    private function getDiffForYear($array)
+    {
         $previous = "00";
 
         // append 0 in values array if days are missing because API not return days without session
-        foreach ($array as $row_key => $row){
+        foreach ($array as $row_key => $row) {
             foreach ($row['labels'] as $key => $item) {
                 if (intval($previous) + 1 != intval($item)) {
                     $diff = intval($item) - intval($previous) - 1;
@@ -294,21 +302,21 @@ class Analytics
      * @param string $start
      * @return array
      */
-    public function getSources($start = "first day of january this year"){
+    public function getSources($start = "first day of january this year")
+    {
+        $data = $this->getBasicChart("users", "channelGrouping", $start);
 
-        $data = $this->getBasicChart( "users", "channelGrouping", $start);
-
-        foreach ($data as $row_key => $row){
+        foreach ($data as $row_key => $row) {
             foreach ($row["labels"] as $key => $label) {
-                if ($label == "(none)"){
+                if ($label == "(none)") {
                     $row["labels"][$key] = ["Direct", null];
-                }else{
+                } else {
                     $row["labels"][$key] = [$label, null];
-
                 }
                 $data[$row_key] = $row;
             }
         }
+
         return $data;
     }
 
@@ -317,9 +325,9 @@ class Analytics
      * @param string $start
      * @return array
      */
-    public function getDevices($start = "30 days ago"){
-
-        $data = $this->getBasicChart( "visits", "deviceCategory", $start);
+    public function getDevices($start = "30 days ago")
+    {
+        $data = $this->getBasicChart("visits", "deviceCategory", $start);
 
         foreach ($data as $row_key => $row) {
             foreach ($row["labels"] as $key => $label) {
@@ -346,13 +354,12 @@ class Analytics
      * @param string $start
      * @return array
      */
-    public function getCountries($start = "first day of january this year"){
-
-        $response = $this->getBasicChart( "users", "country", $start);
-        $data = [];
+    public function getCountries($start = "first day of january this year")
+    {
+        $response = $this->getBasicChart("users", "country", $start);
+        $data     = [];
 
         foreach ($response as $row_key => $row) {
-
             $data_row = [['Country', 'Popularity']];
 
             foreach ($row["labels"] as $key => $item) {
@@ -367,8 +374,8 @@ class Analytics
         return $data;
     }
 
-    public function getUsers($start = "30 days ago"){
-
+    public function getUsers($start = "30 days ago")
+    {
         $dateRange = new Google_Service_AnalyticsReporting_DateRange();
         $dateRange->setStartDate(date('Y-m-d', strtotime($start)));
         $dateRange->setEndDate(date('Y-m-d', strtotime("today")));
@@ -389,11 +396,14 @@ class Analytics
         $data = $this->makeRequest([$metric], [$d1, $d2, $d3], [$dateRange], "formatDataUsers");
 
         return $data;
-
     }
 
-    private function makeRequest(array $metrics, array $dimensions, array $dates, $method = "formatDataChart", $max = null){
+    public function getPages($start = "30 days ago"){
+        return $this->getBasicChart("pageviews", "pagePath", $start, 'yesterday', 10);
+    }
 
+    private function makeRequest(array $metrics, array $dimensions, array $dates, $method = "formatDataChart", $max = null)
+    {
         $data = [];
         foreach ($this->viewIds as $id) {
             // Create the ReportRequest object.
@@ -403,21 +413,21 @@ class Analytics
             $request->setDimensions($dimensions);
             $request->setDateRanges($dates);
 
-            if (count($metrics) == 1){
+            if (count($metrics) == 1) {
                 $order = new Google_Service_AnalyticsReporting_OrderBy();
-                $order->setFieldName( $metrics[0]->getExpression());
+                $order->setFieldName($metrics[0]->getExpression());
                 $order->setOrderType("VALUE");
                 $order->setSortOrder("DESCENDING");
                 $request->setOrderBys($order);
             }
 
-            if ($max){
+            if ($max) {
                 $request->setPageSize($max);
             }
 
             $body = new Google_Service_AnalyticsReporting_GetReportsRequest();
-            $body->setReportRequests( array( $request) );
-            $response = $this->analyticsReport->reports->batchGet( $body );
+            $body->setReportRequests([$request]);
+            $response = $this->analyticsReport->reports->batchGet($body);
 
             $data[$id] = $this->$method($response);
         }
@@ -427,13 +437,12 @@ class Analytics
 
     private function formatDataChart(Google_Response $response)
     {
-
         $data = [
-            "labels" => [],
-            "values" => [],
-            "total" => 0,
+            "labels"   => [],
+            "values"   => [],
+            "total"    => 0,
             'percents' => [],
-            'diff' => []
+            'diff'     => []
         ];
 
         /** @var Google_Report $report */
@@ -442,13 +451,12 @@ class Analytics
             $data["total"] = $report->getData()->getTotals()[0]->getValues()[0];
             foreach ($report->getData()->getRows() as $row) {
                 $value = $row->getMetrics()[0]->getValues()[0];
-                $prct = round(intval($value) / intval($data['total']), 4) * 100;
+                $prct  = round(intval($value) / intval($data['total']), 4) * 100;
 
                 array_push($data["values"], $value);
                 array_push($data["percents"], $prct);
                 array_push($data["labels"], ucfirst($row->getDimensions()[0]));
             }
-
         }
 
         return $data;
@@ -461,13 +469,12 @@ class Analytics
             "values" => []
         ];
 
-        $days = ["Monday" => 0, "Tuesday" => 0, "Wednesday" => 0, "Thursday" => 0, "Friday" => 0, "Saturday" => 0, "Sunday" => 0];
+        $days   = ["Monday" => 0, "Tuesday" => 0, "Wednesday" => 0, "Thursday" => 0, "Friday" => 0, "Saturday" => 0, "Sunday" => 0];
         $visits = [];
 
-        for($i = 0; $i < 24; $i++){
+        for ($i = 0; $i < 24; $i++) {
             $visits[] = $days;
         }
-
 
         /** @var Google_Report $report */
         foreach ($response->getReports() as $report) {
@@ -476,7 +483,7 @@ class Analytics
                 $visits[intval($row->getDimensions()[0])][ucfirst($row->getDimensions()[1])] += intval($row->getMetrics()[0]->getValues()[0]);
             }
 
-            if ($report->getData()->getMaximums()){
+            if ($report->getData()->getMaximums()) {
                 $data["max"] = $report->getData()->getMaximums()[0]->getValues()[0];
             }
         }

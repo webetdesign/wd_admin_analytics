@@ -225,3 +225,15 @@ limitations under the License.
 
 .doughnut-legend table {
   width: 100%; }
+
+.pages-table {
+  width: 100%; }
+  .pages-table tr {
+    font-size: 15px; }
+  .pages-table tr:not(:first-child) {
+    border-top: 1px solid darkgray; }
+  .pages-table td {
+    padding: 2px 0; }
+
+#pages-container {
+  height: auto; }
