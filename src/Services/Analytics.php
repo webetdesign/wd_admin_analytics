@@ -389,7 +389,12 @@ class Analytics
         return $data;
     }
 
-    public function getUsers($start = "30 days ago")
+    /**
+     * @param string $site_id
+     * @param string $start
+     * @return mixed
+     */
+    public function getUsers($site_id, $start = "30 days ago")
     {
         $dateRange = new Google_Service_AnalyticsReporting_DateRange();
         $dateRange->setStartDate(date('Y-m-d', strtotime($start)));
@@ -408,7 +413,9 @@ class Analytics
         $d3 = new Google_Service_AnalyticsReporting_Dimension();
         $d3->setName('ga:day');
 
-        $data = $this->makeRequest([$metric], [$d1, $d2, $d3], [$dateRange], "formatDataUsers");
+        $data = $this->makeRequest([$metric], [$d1, $d2, $d3], [$dateRange], $site_id, "formatDataUsers");
+
+        dump($data);
 
         return $data;
     }

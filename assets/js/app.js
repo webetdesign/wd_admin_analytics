@@ -1,6 +1,6 @@
 require('../sass/index.scss')
 
-import {loadData, loadDoughnut, loadPages} from './analytics.js';
+import {loadData, loadDoughnut, loadPages, loadUsers} from './analytics.js';
 
 
 document.addEventListener('DOMContentLoaded', function(){

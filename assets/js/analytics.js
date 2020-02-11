@@ -164,6 +164,29 @@ function loadPages(reload = false){
 
 }
 
+function loadUsers(reload = false){
+    var name = 'users';
+    var users_color = document.getElementById("users_color").dataset.userscolor;
+
+    if (reload){
+        $('#' + name + '-container')[0].innerHTML = "Chargement ...";
+        $.post('/api/users',
+            {
+                'method': name,
+                'site_id': loadSiteId()
+            }).done(function(data) {
+
+            document.getElementById("data-" + name).dataset.values = JSON.stringify(data[loadSiteId()]);
+            var users = document.getElementById("data-users").dataset.values;
+            renderUsers(JSON.parse(users), users_color, "users");
+        })
+    }else{
+        var users = document.getElementById("data-users" ).dataset.values;
+        renderUsers(JSON.parse(users), users_color, "users");
+    }
+
+}
+
 function loadData(reload = false){
 
     var site_id = loadSiteId();
@@ -199,9 +222,7 @@ function loadData(reload = false){
     }
 
     if (document.getElementById("users-container") != null){
-        var users_color = document.getElementById("users_color").dataset.userscolor;
-        var users = document.getElementById("data-users" + '-' + site_id).dataset.values;
-        renderUsers(JSON.parse(users), users_color, "users");
+        loadUsers(reload);
     }
 }
 
@@ -469,7 +490,7 @@ function renderPages(data){
 function getColorUser(max, value, color){
     if (value === 0) return "#dfdfdf";
     var prct = value / max;
-    return color.substring(0, 17) + ", " + (prct * 2) + ")";
+    return color.substring(0, 17) + ", " + (prct) + ")";
 
 }
 
@@ -527,4 +548,4 @@ function makeCanvas(id) {
     return ctx;
 }
 
-export {loadDoughnut, getColors, loadData, loadPages}
+export {loadDoughnut, loadData, loadPages, loadUsers}
