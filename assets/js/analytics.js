@@ -4,7 +4,7 @@ import Chart from "chart.js"
 function loadDoughnut(name, reload = false){
     if (reload){
         $('#' + name + '-container')[0].innerHTML = "Chargement ...";
-        $.post('/api/doughnut',
+        $.post('/api/basic',
             {
                 'start': loadStart(name),
                 'method': name,
@@ -41,6 +41,33 @@ function loadStart(name){
     return $("#select_start_" + name)[0].selectedOptions[0].value;
 }
 
+function loadMap(reload){
+    var countries = document.getElementById("data-countries").dataset.values;
+    var map = document.getElementById("map_key").dataset.mapkey;
+    var map_color = document.getElementById("map_color").dataset.mapcolor;
+    var name = 'countries';
+
+    if (reload){
+        $('#' + name + '-container')[0].innerHTML = "Chargement ...";
+        $.post('/api/basic',
+            {
+                'start': document.getElementById("countries-container").dataset.start,
+                'method': name,
+                'site_id': loadSiteId()
+            }).done(function(data) {
+
+            document.getElementById("data-" + name).dataset.values = JSON.stringify(data[loadSiteId()]);
+
+            var countries = document.getElementById("data-" + name).dataset.values;
+
+            renderCountries(JSON.parse(countries), map_color    , map);
+        })
+    }else{
+        var countries = document.getElementById("data-" + name).dataset.values;
+        renderCountries(JSON.parse(countries), map_color    , map);
+    }
+
+}
 function loadData(reload = false){
 
     var site_id = loadSiteId();
@@ -99,11 +126,7 @@ function loadData(reload = false){
     }
 
     if (document.getElementById("countries-container") != null){
-        var countries = document.getElementById("data-countries" + '-' + site_id).dataset.values;
-        var map = document.getElementById("map_key").dataset.mapkey;
-        var map_color = document.getElementById("map_color").dataset.mapcolor;
-
-        renderCountries(JSON.parse(countries), map_color    , map);
+        loadMap(true)
     }
 
     if (document.getElementById("users-container") != null){

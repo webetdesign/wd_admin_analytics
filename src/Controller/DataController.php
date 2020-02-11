@@ -25,7 +25,7 @@ class DataController extends AbstractController
     /**
      * @param Request $request
      */
-    public function doughnut(Request $request){
+    public function basic(Request $request){
         $method = 'get' . ucfirst($request->request->get('method', 'Devices'));
         return new JsonResponse($this->analytics->$method(
             $request->request->get('site_id'),

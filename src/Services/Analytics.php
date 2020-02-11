@@ -364,9 +364,9 @@ class Analytics
      * @param string $start
      * @return array
      */
-    public function getCountries($start = "first day of january this year")
+    public function getCountries($site_id, $start = "first day of january this year")
     {
-        $response = $this->getBasicChart("users", "country", $start);
+        $response = $this->getBasicChart("users", "country", $start, $site_id,'yesterday' ,30);
         $data     = [];
 
         foreach ($response as $row_key => $row) {
