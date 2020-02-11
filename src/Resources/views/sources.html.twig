@@ -4,6 +4,7 @@
             <i class="{{ icon }}"></i>
         {% endif %}
         <h3 class="box-title ">Canal de trafic </h3>
+        {% include '@WDAdminAnalytics/select_start.html.twig' with {'default' : start | default(''), 'name' : 'sources'} %}
     </div>
     <div class="box-body">
         <figure class="Chartjs-figure" id="sources-container"></figure>

@@ -1,4 +1,4 @@
-devices_list:
-  path: /api/devices
+doughnut_list:
+  path: /api/doughnut
   # the controller value has the format 'controller_class::method_name'
-  controller: WebEtDesign\AnalyticsBundle\Controller\DataController::devices
+  controller: WebEtDesign\AnalyticsBundle\Controller\DataController::doughnut

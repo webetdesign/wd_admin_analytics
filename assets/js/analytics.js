@@ -1,17 +1,16 @@
 import Chart from "chart.js"
 // import './gapi.js';
 
-
-function loadBrowsers(){
-    var browsers = document.getElementById("data-browsers"  + '-' + loadSiteId()).dataset.values;
-    renderDoughnut(JSON.parse(browsers), getColors(), "browsers");
-}
-
-
 function loadDoughnut(name, reload = false){
     if (reload){
         $('#' + name + '-container')[0].innerHTML = "Chargement ...";
-        $.post('/api/' + name, {'start': loadStart(name), 'site_id': loadSiteId()}).done(function(data) {
+        $.post('/api/doughnut',
+            {
+                'start': loadStart(name),
+                'method': name,
+                'site_id': loadSiteId()
+            }).done(function(data) {
+
             document.getElementById("data-" + name).dataset.values = JSON.stringify(data[loadSiteId()]);
             var container = document.getElementById("data-" + name).dataset.values;
 
@@ -49,7 +48,7 @@ function loadData(reload = false){
     var colors = getColors();
 
     if (document.getElementById("browsers-container") != null){
-        loadBrowsers();
+        loadDoughnut('browsers', reload)
     }
 
     if (document.getElementById('week-container') != null){
@@ -87,8 +86,7 @@ function loadData(reload = false){
     }
 
     if (document.getElementById("sources-container") != null){
-        var sources = document.getElementById("data-sources" + '-' + site_id).dataset.values;
-        renderDoughnut(JSON.parse(sources), colors, "sources");
+        loadDoughnut('sources', reload)
     }
 
     if (document.getElementById("devices-container") != null){
@@ -167,22 +165,38 @@ function renderDoughnut(response, colors, name) {
             legendCallback: function(chart) {
                 var legendHtml = [];
                 var item = chart.data.datasets[0];
+                var width = (100 / item.data.length) + "%";
+                var td = null;
                 legendHtml.push('<table style="margin-bottom: 5px; margin-top: 30px"><tr>')
-                for (var i=0; i < item.data.length; i++) {
-                    legendHtml.push('<td class="chart-legend" style="color:' + item.backgroundColor[i] +'"><i class="' + chart.data.labels[i][1] +'"></i></td>');
-                }
-                legendHtml.push('</tr>')
 
-                legendHtml.push('<tr>')
+                if (chart.data.labels[0][1] !== null){
+                    for (var i=0; i < item.data.length; i++) {
+                        legendHtml.push('<td class="chart-legend" style="color:' + item.backgroundColor[i] +'"><i class="' + chart.data.labels[i][1] +'"></i></td>');
+                    }
+                    legendHtml.push('</tr>')
+
+                    legendHtml.push('<tr>')
+                }
+
                 for (var i=0; i < item.data.length; i++) {
-                    legendHtml.push('<td class="chart-legend-label-text">' + chart.data.labels[i][0] +'</td>');
+                    td = '<td class="chart-legend-label-text"';
+                    td += 'style="width: ' + width;
+                    if (chart.data.labels[i][1] == null){
+                        td += ' ; color:' + item.backgroundColor[i] + '">';
+                    }else{
+                        td += '">';
+                    }
+
+                    td += chart.data.labels[i][0] +'</td>';
+                    legendHtml.push(td)
+
                 }
                 legendHtml.push('</tr>')
 
                 legendHtml.push('<tr>')
                 for (var i=0; i < item.data.length; i++) {
                     var prct = parseFloat(chart.data.percents[i]).toFixed(2)
-                    legendHtml.push('<td class="chart-legend-label-text">' + prct +' %</td>');
+                    legendHtml.push('<td class="chart-legend-label-text" style="width: ' + width +' ">' + prct +' %</td>');
                 }
                 legendHtml.push('</tr>')
 
@@ -190,7 +204,7 @@ function renderDoughnut(response, colors, name) {
                 for (var i=0; i < item.data.length; i++) {
                     var prct = parseFloat(chart.data.diff[i]).toFixed(2)
                     var css = prct >= 0 ? 'text-success' : 'text-danger';
-                    legendHtml.push('<td class="chart-legend-label-diff ' + css + ' ">' + prct +' %</td>');
+                    legendHtml.push('<td class="chart-legend-label-diff ' + css + ' " style="width: ' + width +' ">' + prct +' %</td>');
                 }
                 legendHtml.push('</tr>')
 

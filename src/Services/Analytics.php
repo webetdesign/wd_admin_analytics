@@ -2,6 +2,7 @@
 
 namespace WebEtDesign\AnalyticsBundle\Services;
 
+use Cocur\Slugify\Slugify;
 use DateTime;
 use Google_Client;
 use Google_Service_AnalyticsReporting;
@@ -43,6 +44,9 @@ class Analytics
      */
     public $maxPage;
 
+    /** @var Slugify $slugify */
+    public $slugify;
+
     /**
      * Analytics constructor.
      * @param GoogleAnalyticsService $analyticsService
@@ -56,6 +60,7 @@ class Analytics
         $this->client           = $analyticsService->getClient();
         $this->analyticsReport  = new Google_Service_AnalyticsReporting($this->client);
         $this->maxPage          = $maxPage;
+        $this->slugify = new Slugify();
     }
 
     /**
@@ -107,17 +112,19 @@ class Analytics
 
     /**
      * Return Number or Users per Browser
+     * @param string $site_id
      * @param string $start
      * @return array
      */
-    public function getBrowsers($start = "30 days ago")
+    public function getBrowsers($site_id, $start = "30 days ago")
     {
-        $data = $this->getBasicChart("users", "browser", $start);
+        $data = $this->getBasicChart("users", "browser", $start, $site_id, 'yesterday', 5);
 
         foreach ($data as $row_key => $row) {
             foreach ($row["labels"] as $key => $label) {
-                $row["labels"][$key] = [$label, null];
-                $data[$row_key]      = $row;
+                $icon = 'fa-2x fa fa-' . $this->slugify->slugify($label);
+                $row["labels"][$key] = [$label, $icon];
+                $data[$row_key] = $row;
             }
         }
 
@@ -300,12 +307,13 @@ class Analytics
 
     /**
      * Return number of users per source
+     * @param string $site_id
      * @param string $start
      * @return array
      */
-    public function getSources($start = "first day of january this year")
+    public function getSources($site_id, $start = "first day of january this year")
     {
-        $data = $this->getBasicChart("users", "channelGrouping", $start);
+        $data = $this->getBasicChart("users", "channelGrouping", $start, $site_id);
 
         foreach ($data as $row_key => $row) {
             foreach ($row["labels"] as $key => $label) {
