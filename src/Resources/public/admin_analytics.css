@@ -233,12 +233,15 @@ limitations under the License.
     font-size: 15px; }
   .pages-table tr:not(:first-child) {
     border-top: 1px solid darkgray; }
+  .pages-table td:not(:first-child) {
+    float: right;
+    padding-right: 20%; }
   .pages-table td {
     padding: 2px 0; }
 
 #pages-container {
   height: auto; }
 
-.select_start {
+.select_start, .select_start_pages {
   width: auto !important;
   float: right !important; }

@@ -4,6 +4,7 @@
             <i class="{{ icon }}"></i>
         {% endif %}
         <h3 class="box-title ">Pages </h3>
+        {% include '@WDAdminAnalytics/select_start.html.twig' with {'default' : start | default(''), 'name' : 'pages', 'class': 'select_start_pages'} %}
     </div>
     <div class="box-body">
         <div class="Chartjs-figure" id="pages-container"></div>

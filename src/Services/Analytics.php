@@ -408,8 +408,13 @@ class Analytics
         return $data;
     }
 
-    public function getPages($start = "30 days ago"){
-        return $this->getBasicChart("pageviews", "pagePath", $start, 'yesterday', 10);
+    /**
+     * @param $site_id
+     * @param string $start
+     * @return array
+     */
+    public function getPages($site_id, $start = "30 days ago"){
+        return $this->getBasicChart("pageviews", "pagePath", $start, $site_id,'yesterday', 10);
     }
 
     private function makeRequest(array $metrics, array $dimensions, array $dates, $site_id, $method = "formatDataChart",  $max = null)

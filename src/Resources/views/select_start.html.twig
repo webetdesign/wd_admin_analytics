@@ -6,7 +6,7 @@
 }
 %}
 
-<select class="select_start" id="select_start_{{ name | default('') }}" data-name="{{ name | default('') }}">
+<select class="{{ class | default('select_start')}}" id="select_start_{{ name | default('') }}" data-name="{{ name | default('') }}">
     {% for key, start in starts %}
         <option value="{{key}}" {% if default is defined and default == key %} selected {% endif %}>{{start}}</option>
     {% endfor %}

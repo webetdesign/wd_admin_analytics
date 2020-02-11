@@ -20,6 +20,11 @@
         border-top: 1px solid darkgray;
     }
 
+    & td:not(:first-child){
+        float: right;
+        padding-right: 20%;
+    }
+
     td {
         padding: 2px 0;
     }
@@ -29,7 +34,7 @@
     height: auto;
 }
 
-.select_start{
+.select_start, .select_start_pages{
     width: auto !important;
     float: right !important;
 }

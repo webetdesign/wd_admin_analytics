@@ -68,6 +68,33 @@ function loadMap(reload){
     }
 
 }
+
+function loadPages(reload = false){
+    var name = 'pages';
+
+    if (reload){
+        $('#' + name + '-container')[0].innerHTML = "Chargement ...";
+        $.post('/api/basic',
+            {
+                'start': loadStart(name),
+                'method': name,
+                'site_id': loadSiteId()
+            }).done(function(data) {
+
+            document.getElementById("data-" + name).dataset.values = JSON.stringify(data[loadSiteId()]);
+            var container = document.getElementById("data-" + name).dataset.values;
+
+            renderPages(JSON.parse(container));
+        })
+    }else{
+        var container = document.getElementById("data-" + name).dataset.values;
+
+        renderPages(JSON.parse(container));
+    }
+
+}
+
+
 function loadData(reload = false){
 
     var site_id = loadSiteId();
@@ -121,12 +148,11 @@ function loadData(reload = false){
     }
 
     if (document.getElementById("pages-container") != null){
-        var pages = document.getElementById("data-pages" + '-' + site_id).dataset.values;
-        renderPages(JSON.parse(pages));
+        loadPages(reload);
     }
 
     if (document.getElementById("countries-container") != null){
-        loadMap(true)
+        loadMap(reload)
     }
 
     if (document.getElementById("users-container") != null){
@@ -432,4 +458,4 @@ function makeCanvas(id) {
     return ctx;
 }
 
-export {loadDoughnut, getColors, loadData}
+export {loadDoughnut, getColors, loadData, loadPages}
