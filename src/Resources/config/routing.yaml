@@ -2,3 +2,8 @@ basic_list:
   path: /api/basic
   # the controller value has the format 'controller_class::method_name'
   controller: WebEtDesign\AnalyticsBundle\Controller\DataController::basic
+
+users_list:
+  path: /api/users
+  # the controller value has the format 'controller_class::method_name'
+  controller: WebEtDesign\AnalyticsBundle\Controller\DataController::users

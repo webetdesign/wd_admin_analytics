@@ -132,12 +132,13 @@ class Analytics
     }
 
     /**
+     * @param string $site_id
      * Return the number of users each day for periods :
      *      [monday -> today] this week
      *      [monday -> sunday] last week
      * @return array
      */
-    public function getUserWeek()
+    public function getUserWeek($site_id)
     {
         $thisWeek = new Google_Service_AnalyticsReporting_DateRange();
         // week - 1
@@ -161,11 +162,14 @@ class Analytics
         $dimension_2 = new Google_Service_AnalyticsReporting_Dimension();
         $dimension_2->setName("ga:nthDay");
 
-        $response_this_week = $this->makeRequest([$metric], [$dimension_1, $dimension_2], [$thisWeek]);
-        $response_last_week = $this->makeRequest([$metric], [$dimension_1, $dimension_2], [$lastWeek]);
+        $response_this_week = $this->makeRequest([$metric], [$dimension_1, $dimension_2], [$thisWeek], $site_id);
+        $response_last_week = $this->makeRequest([$metric], [$dimension_1, $dimension_2], [$lastWeek], $site_id);
 
+        dump($response_last_week);
         $response_this_week = $this->getDiffForWeek($response_this_week);
         $response_last_week = $this->getDiffForWeek($response_last_week);
+        dump($response_last_week);
+
 
         foreach ($response_this_week as $key => $row) {
             $data[$key] = [
@@ -231,12 +235,13 @@ class Analytics
     }
 
     /**
+     * @param string $site_id
      * Return the number of users each month for periods :
      *      [january -> today] this year
      *      [january -> december] last year
      * @return array
      */
-    public function getUserYear()
+    public function getUserYear($site_id)
     {
         $thisYear = new Google_Service_AnalyticsReporting_DateRange();
         // this monday
@@ -260,8 +265,8 @@ class Analytics
         $dimension_2 = new Google_Service_AnalyticsReporting_Dimension();
         $dimension_2->setName("ga:nthMonth");
 
-        $response_this_year = $this->makeRequest([$metric], [$dimension_1, $dimension_2], [$thisYear]);
-        $response_last_year = $this->makeRequest([$metric], [$dimension_1, $dimension_2], [$lastYear]);
+        $response_this_year = $this->makeRequest([$metric], [$dimension_1, $dimension_2], [$thisYear], $site_id);
+        $response_last_year = $this->makeRequest([$metric], [$dimension_1, $dimension_2], [$lastYear], $site_id);
 
         $response_this_year = $this->getDiffForYear($response_this_year);
         $response_last_year = $this->getDiffForYear($response_last_year);
@@ -426,7 +431,7 @@ class Analytics
         $request->setDimensions($dimensions);
         $request->setDateRanges($dates);
 
-        if (count($metrics) == 1) {
+        if (count($metrics) == 1 && count($dimensions) == 1) {
             $order = new Google_Service_AnalyticsReporting_OrderBy();
             $order->setFieldName($metrics[0]->getExpression());
             $order->setOrderType("VALUE");

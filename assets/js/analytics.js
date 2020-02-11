@@ -69,6 +69,76 @@ function loadMap(reload){
 
 }
 
+function loadUserWeek(reload){
+    var week_colors = {
+        0 : null,
+        1 : null
+    };
+
+    if ( document.getElementById("week_colors") != null){
+        week_colors = document.getElementById("week_colors").dataset.weekcolors;
+        week_colors = JSON.parse(week_colors);
+    }
+
+    var name = 'userWeek';
+
+    if (reload){
+        $('#' + name + '-container')[0].innerHTML = "Chargement ...";
+        $.post('/api/users',
+            {
+                'method': name,
+                'site_id': loadSiteId()
+            }).done(function(data) {
+
+            document.getElementById("data-" + name).dataset.values = JSON.stringify(data[loadSiteId()]);
+
+            var weeks = document.getElementById("data-userWeek").dataset.values;
+
+            renderWeekOverWeekChart(JSON.parse(weeks), week_colors);
+        })
+    }else{
+        var weeks = document.getElementById("data-userWeek").dataset.values;
+
+        renderWeekOverWeekChart(JSON.parse(weeks), week_colors);
+    }
+
+}
+
+function loadUserYear(reload){
+    var year_colors = {
+        0 : null,
+        1 : null
+    };
+
+    if ( document.getElementById("year_colors") != null){
+        year_colors = document.getElementById("year_colors").dataset.yearcolors;
+        year_colors = JSON.parse(year_colors);
+    }
+
+    var name = 'userYear';
+
+    if (reload){
+        $('#' + name + '-container')[0].innerHTML = "Chargement ...";
+        $.post('/api/users',
+            {
+                'method': name,
+                'site_id': loadSiteId()
+            }).done(function(data) {
+
+            document.getElementById("data-" + name).dataset.values = JSON.stringify(data[loadSiteId()]);
+
+            var years = document.getElementById("data-userYear").dataset.values;
+
+            renderYearOverYearChart(JSON.parse(years), year_colors);
+        })
+    }else{
+        var years = document.getElementById("data-userYear").dataset.values;
+
+        renderYearOverYearChart(JSON.parse(years), year_colors);
+    }
+
+}
+
 function loadPages(reload = false){
     var name = 'pages';
 
@@ -94,7 +164,6 @@ function loadPages(reload = false){
 
 }
 
-
 function loadData(reload = false){
 
     var site_id = loadSiteId();
@@ -105,38 +174,12 @@ function loadData(reload = false){
         loadDoughnut('browsers', reload)
     }
 
-    if (document.getElementById('week-container') != null){
-
-        var week_colors = {
-            0 : null,
-            1 : null
-        };
-
-        if ( document.getElementById("week_colors") != null){
-            week_colors = document.getElementById("week_colors").dataset.weekcolors;
-            week_colors = JSON.parse(week_colors);
-        }
-
-        var weeks = document.getElementById("data-userWeek" + '-' + site_id).dataset.values;
-
-        renderWeekOverWeekChart(JSON.parse(weeks), week_colors);
+    if (document.getElementById('userWeek-container') != null){
+        loadUserWeek(reload)
     }
 
-    if (document.getElementById('year-container') != null){
-
-        var year_colors = {
-            0 : null,
-            1 : null
-        };
-
-        if ( document.getElementById("year_colors") != null){
-            year_colors = document.getElementById("year_colors").dataset.yearcolors;
-            year_colors = JSON.parse(year_colors);
-        }
-
-        var years = document.getElementById("data-userYear" + '-' + site_id).dataset.values;
-
-        renderYearOverYearChart(JSON.parse(years), year_colors);
+    if (document.getElementById('userYear-container') != null){
+        loadUserYear(reload)
     }
 
     if (document.getElementById("sources-container") != null){
@@ -275,24 +318,38 @@ function renderWeekOverWeekChart(data, colors) {
                 label: 'Semaine dernière',
                 borderColor : colors[0],
                 pointColor : colors[0],
-                backgroundColor: "rgb(255, 255, 255, 0)",
+                backgroundColor: 'rgb(255,255,255,0)',
                 borderDash: [10, 8],
                 pointStrokeColor : '#fff',
-                data :  data.values.last_week
+                data :  data.values.last_week,
+                fill: true
             },
             {
                 label: 'Cette semaine',
                 borderColor : colors[1],
-                backgroundColor: "rgb(255, 255, 255, 0)",
                 pointColor : colors[1],
+                backgroundColor: 'rgb(255,255,255,0)',
                 pointStrokeColor : '#fff',
-                data : data.values.this_week
-            }
+                data : data.values.this_week,
+                fill: true
+            },
         ]
     };
 
-    var  options = {};
-    new Chart(makeCanvas('week-container'), {
+    var  options = {
+        tooltips: {
+            mode: 'index',
+            intersect: false,
+            callbacks: {
+                labelColor: function(tooltipItem, chart) {
+                    return {
+                        backgroundColor: colors[tooltipItem.datasetIndex]
+                    }
+                },
+            }
+        }
+    };
+    new Chart(makeCanvas('userWeek-container'), {
         type: 'line',
         data: values,
         options: options
@@ -317,8 +374,20 @@ function renderYearOverYearChart(data, colors) {
         ]
     };
 
-    var  options = {};
-    new Chart(makeCanvas('year-container'), {
+    var  options = {
+        tooltips: {
+            mode: 'index',
+            intersect: false,
+            callbacks: {
+                labelColor: function(tooltipItem, chart) {
+                    return {
+                        backgroundColor: colors[tooltipItem.datasetIndex]
+                    }
+                },
+            }
+        }
+    };
+    new Chart(makeCanvas('userYear-container'), {
         type: 'bar',
         data: values,
         options: options
