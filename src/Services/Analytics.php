@@ -165,11 +165,8 @@ class Analytics
         $response_this_week = $this->makeRequest([$metric], [$dimension_1, $dimension_2], [$thisWeek], $site_id);
         $response_last_week = $this->makeRequest([$metric], [$dimension_1, $dimension_2], [$lastWeek], $site_id);
 
-        dump($response_last_week);
         $response_this_week = $this->getDiffForWeek($response_this_week);
         $response_last_week = $this->getDiffForWeek($response_last_week);
-        dump($response_last_week);
-
 
         foreach ($response_this_week as $key => $row) {
             $data[$key] = [
