@@ -1,29 +1,55 @@
 import Chart from "chart.js"
 // import './gapi.js';
 
-document.addEventListener('DOMContentLoaded', function(){
-    $('#select-website').on('change', function(){
-        loadData();
-    })
-    loadData();
-}, false);
 
-$(window).resize(function() {
-    loadData();
-})
+function loadBrowsers(){
+    var browsers = document.getElementById("data-browsers"  + '-' + loadSiteId()).dataset.values;
+    renderDoughnut(JSON.parse(browsers), getColors(), "browsers");
+}
 
-function loadData(){
+
+function loadDoughnut(name, reload = false){
+    if (reload){
+        $('#' + name + '-container')[0].innerHTML = "Chargement ...";
+        $.post('/api/' + name, {'start': loadStart(name), 'site_id': loadSiteId()}).done(function(data) {
+            document.getElementById("data-" + name).dataset.values = JSON.stringify(data[loadSiteId()]);
+            var container = document.getElementById("data-" + name).dataset.values;
+
+            renderDoughnut(JSON.parse(container), getColors(), name);
+        })
+    }else{
+        var container = document.getElementById("data-" + name).dataset.values;
+
+        renderDoughnut(JSON.parse(container), getColors(), name);
+    }
+
+}
+
+function getColors() {
     var colors = null;
-    var site_id = document.getElementById('select-website').selectedOptions[0].value;
-
     if ( document.getElementById("colors")){
         colors = document.getElementById("colors").dataset.colors;
         colors = JSON.parse(colors);
     }
+    return colors;
+}
+
+function loadSiteId(){
+    return document.getElementById('select-website').selectedOptions[0].value;
+}
+
+function loadStart(name){
+    return $("#select_start_" + name)[0].selectedOptions[0].value;
+}
+
+function loadData(reload = false){
+
+    var site_id = loadSiteId();
+
+    var colors = getColors();
 
     if (document.getElementById("browsers-container") != null){
-        var browsers = document.getElementById("data-browsers"  + '-' + site_id).dataset.values;
-        renderDoughnut(JSON.parse(browsers), colors, "browsers");
+        loadBrowsers();
     }
 
     if (document.getElementById('week-container') != null){
@@ -66,8 +92,7 @@ function loadData(){
     }
 
     if (document.getElementById("devices-container") != null){
-        var devices = document.getElementById("data-devices" + '-' + site_id).dataset.values;
-        renderDoughnut(JSON.parse(devices), colors, "devices");
+        loadDoughnut('devices', reload)
     }
 
     if (document.getElementById("pages-container") != null){
@@ -370,3 +395,4 @@ function makeCanvas(id) {
     return ctx;
 }
 
+export {loadDoughnut, getColors, loadData}

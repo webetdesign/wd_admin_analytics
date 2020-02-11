@@ -1,0 +1,4 @@
+devices_list:
+  path: /api/devices
+  # the controller value has the format 'controller_class::method_name'
+  controller: WebEtDesign\AnalyticsBundle\Controller\DataController::devices

@@ -1,0 +1,13 @@
+{% set starts = {
+    "yesterday" : "Hier",
+    "7 days ago" : "7 derniers jours",
+    "28 days ago" : "28 derniers jours",
+    "90 days ago" : "90 derniers jours",
+}
+%}
+
+<select class="select_start" id="select_start_{{ name | default('') }}" data-name="{{ name | default('') }}">
+    {% for key, start in starts %}
+        <option value="{{key}}" {% if default is defined and default == key %} selected {% endif %}>{{start}}</option>
+    {% endfor %}
+</select>

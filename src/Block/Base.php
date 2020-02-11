@@ -27,18 +27,21 @@ class Base extends AbstractBlockService
 
     private $view_names;
 
+    private $view_ids;
+
     /**
      * @param string $name
      * @param EngineInterface $templating
      * @param Analytics $analyticsService
      */
-    public function __construct($name, EngineInterface $templating, Analytics $analyticsService, $mapKey, $names)
+    public function __construct($name, EngineInterface $templating, Analytics $analyticsService, $mapKey, $names, $ids)
     {
         parent::__construct($name, $templating);
 
         $this->analyticsService = $analyticsService;
         $this->mapKey = $mapKey;
         $this->view_names = $names;
+        $this->view_ids = $ids;
     }
 
     /**
@@ -64,10 +67,10 @@ class Base extends AbstractBlockService
             $method = "get" . ucfirst($block_name);
             $row = [];
             $row["template"] = "@WDAdminAnalytics/" . $block_name . ".html.twig";
-            $start ? $row["data"] = $this->analyticsService->$method($start) : $row["data"] = $this->analyticsService->$method();
             $row["name"] = $block_name;
             $row["icon"] = $icon;
             $row["size"] = $size;
+            $row["start"] = $start;
             $blocks[] = $row;
         }
 
@@ -80,7 +83,8 @@ class Base extends AbstractBlockService
             'year_colors' => json_encode($settings['year_colors']),
             'colors' => json_encode($settings['colors']),
             'blocks' => $blocks,
-            'view_names' => $this->view_names
+            'view_names' => $this->view_names,
+            'view_ids' => $this->view_ids
         ], $response);
     }
 

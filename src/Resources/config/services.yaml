@@ -7,16 +7,25 @@ services:
       - '@analytics_api.service'
       - '%wd_admin_analytics.map_key%'
       - '%wd_admin_analytics.view_names%'
+      - '%wd_admin_analytics.view_ids%'
     tags:
       - { name: sonata.block }
+
   analytics_api.api:
     class: MediaFigaro\GoogleAnalyticsApi\Service\GoogleAnalyticsService
     arguments: ["%google_analytics_api.google_analytics_json_key%"]
     public: true
 
-  analytics_api.service:
-    public: true
-    class: WebEtDesign\AnalyticsBundle\Services\Analytics
+  WebEtDesign\AnalyticsBundle\Services\Analytics:
     arguments:
       - '@analytics_api.api'
       - '%wd_admin_analytics.view_ids%'
+
+  analytics_api.service:
+    alias: WebEtDesign\AnalyticsBundle\Services\Analytics
+    public: true
+
+  WebEtDesign\AnalyticsBundle\Controller\DataController:
+    arguments:
+      - '@analytics_api.service'
+    tags: ['controller.service_arguments']

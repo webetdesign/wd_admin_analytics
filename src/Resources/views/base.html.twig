@@ -1,14 +1,15 @@
-<div id="block-select" class="col-xs-12 " style="{% if blocks[0].data | length == 1 %} display: none {% endif %}">
+<div id="block-select" class="col-xs-12 col-md-6 " style="{% if view_ids | length == 1 %} display: none {% endif %}">
     <div class="Chartjs  p-4 shadow bg-block-analytics box box-primary"  >
-        <div class="box-header text-center">
-            <h3>Sites </h3>
+        <div class="box-header box-header-analytics">
+            <i class="fa fa-chrome"></i>
+            <h3 class="box-title ">Sites </h3>
         </div>
         <div class="box-body">
             <div class="row">
                 <div class="col-xs-12 col-md-4">
                     <select name="" id="select-website">
-                        {% for key, site in blocks[0].data %}
-                            <option value="{{ key }}">{{ view_names[loop.index - 1] }}</option>
+                        {% for key, id in view_ids %}
+                            <option value="{{ id }}">{{ view_names[key] }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -20,13 +21,11 @@
 
 {% for block in blocks %}
     <div id="block-{{ block.name }}" class="{{ block.size | default('col-md-6') }} col-xs-12" >
-        {% include block.template with {icon : block.icon} %}
+        {% include block.template with {icon : block.icon, start: block.start} %}
     </div>
 
-    {% for key, site in block.data %}
-        <div id="data-{{ block.name }}-{{ key }}"  style="display: none;" data-values="{{ site | json_encode }}">
-        </div>
-    {% endfor %}
+    <div id="data-{{ block.name }}"  style="display: none;" data-values="">
+    </div>
 {% endfor %}
 
 

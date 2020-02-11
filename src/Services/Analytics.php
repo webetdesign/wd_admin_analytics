@@ -62,10 +62,11 @@ class Analytics
      * @param string $metric_name
      * @param string $dimension_name
      * @param string $start
+     * @param string $site_id
      * @param string $end
      * @return array
      */
-    public function getBasicChart($metric_name, $dimension_name, $start, $end = "yesterday", $max = null)
+    public function getBasicChart($metric_name, $dimension_name, $start, $site_id, $end = "yesterday", $max = null)
     {
         $max = $max ? $max : $this->maxPage;
 
@@ -80,7 +81,7 @@ class Analytics
         $dimension = new Google_Service_AnalyticsReporting_Dimension();
         $dimension->setName("ga:" . $dimension_name);
 
-        $actual = $this->makeRequest([$metric], [$dimension], [$dateRange], "formatDataChart", $max);
+        $actual = $this->makeRequest([$metric], [$dimension], [$dateRange], $site_id, "formatDataChart", $max);
 
         $dateRange = new Google_Service_AnalyticsReporting_DateRange();
         $dateRange->setStartDate(
@@ -88,7 +89,7 @@ class Analytics
         );
         $dateRange->setEndDate(date('Y-m-d', strtotime(date('Y-m-d', strtotime($start)) . ' -1 day')));
 
-        $history = $this->makeRequest([$metric], [$dimension], [$dateRange], "formatDataChart", $max);
+        $history = $this->makeRequest([$metric], [$dimension], [$dateRange],$site_id,  "formatDataChart", $max);
 
         foreach ($actual as $siteId => $fields) {
             foreach ($fields['labels'] as $key => $item) {
@@ -323,11 +324,12 @@ class Analytics
     /**
      * Return of users per device
      * @param string $start
+     * @param string $site_id
      * @return array
      */
-    public function getDevices($start = "30 days ago")
+    public function getDevices($site_id, $start = "30 days ago")
     {
-        $data = $this->getBasicChart("visits", "deviceCategory", $start);
+        $data = $this->getBasicChart("visits", "deviceCategory", $start, $site_id);
 
         foreach ($data as $row_key => $row) {
             foreach ($row["labels"] as $key => $label) {
@@ -402,35 +404,32 @@ class Analytics
         return $this->getBasicChart("pageviews", "pagePath", $start, 'yesterday', 10);
     }
 
-    private function makeRequest(array $metrics, array $dimensions, array $dates, $method = "formatDataChart", $max = null)
+    private function makeRequest(array $metrics, array $dimensions, array $dates, $site_id, $method = "formatDataChart",  $max = null)
     {
-        $data = [];
-        foreach ($this->viewIds as $id) {
-            // Create the ReportRequest object.
-            $request = new Google_Service_AnalyticsReporting_ReportRequest();
-            $request->setViewId(strval($id));
-            $request->setMetrics($metrics);
-            $request->setDimensions($dimensions);
-            $request->setDateRanges($dates);
+        // Create the ReportRequest object.
+        $request = new Google_Service_AnalyticsReporting_ReportRequest();
+        $request->setViewId(strval($site_id));
+        $request->setMetrics($metrics);
+        $request->setDimensions($dimensions);
+        $request->setDateRanges($dates);
 
-            if (count($metrics) == 1) {
-                $order = new Google_Service_AnalyticsReporting_OrderBy();
-                $order->setFieldName($metrics[0]->getExpression());
-                $order->setOrderType("VALUE");
-                $order->setSortOrder("DESCENDING");
-                $request->setOrderBys($order);
-            }
-
-            if ($max) {
-                $request->setPageSize($max);
-            }
-
-            $body = new Google_Service_AnalyticsReporting_GetReportsRequest();
-            $body->setReportRequests([$request]);
-            $response = $this->analyticsReport->reports->batchGet($body);
-
-            $data[$id] = $this->$method($response);
+        if (count($metrics) == 1) {
+            $order = new Google_Service_AnalyticsReporting_OrderBy();
+            $order->setFieldName($metrics[0]->getExpression());
+            $order->setOrderType("VALUE");
+            $order->setSortOrder("DESCENDING");
+            $request->setOrderBys($order);
         }
+
+        if ($max) {
+            $request->setPageSize($max);
+        }
+
+        $body = new Google_Service_AnalyticsReporting_GetReportsRequest();
+        $body->setReportRequests([$request]);
+        $response = $this->analyticsReport->reports->batchGet($body);
+
+        $data[$site_id] = $this->$method($response);
 
         return $data;
     }
