@@ -34,7 +34,11 @@ function getColors() {
 }
 
 function loadSiteId(){
-    return document.getElementById('select-website').selectedOptions[0].value;
+    if (document.getElementById('select-website')){
+        return document.getElementById('select-website').selectedOptions[0].value;
+    }
+
+    return null;
 }
 
 function loadStart(name){
@@ -190,6 +194,8 @@ function loadUsers(reload = false){
 function loadData(reload = false){
 
     var site_id = loadSiteId();
+
+    if (!site_id) return;
 
     var colors = getColors();
 
