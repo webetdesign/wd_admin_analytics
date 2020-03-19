@@ -362,11 +362,11 @@ class Analytics
     }
 
     /**
-     * Return of users per country
+     * Return number of users per country for map
      * @param string $start
      * @return array
      */
-    public function getCountries($site_id, $start = "first day of january this year")
+    public function getCountriesMap($site_id, $start = "first day of january this year")
     {
         $response = $this->getBasicChart("users", "country", $start, $site_id,'yesterday' ,30);
         $data     = [];
@@ -384,6 +384,16 @@ class Analytics
         }
 
         return $data;
+    }
+
+    /**
+     * Return number of users per country for chart
+     * @param string $start
+     * @return array
+     */
+    public function getCountriesChart($site_id, $start = "first day of january this year")
+    {
+        return $this->getBasicChart("users", "country", $start, $site_id,'yesterday' ,30);
     }
 
     /**
@@ -411,8 +421,6 @@ class Analytics
         $d3->setName('ga:day');
 
         $data = $this->makeRequest([$metric], [$d1, $d2, $d3], [$dateRange], $site_id, "formatDataUsers");
-
-        dump($data);
 
         return $data;
     }

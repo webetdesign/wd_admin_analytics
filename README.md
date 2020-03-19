@@ -39,10 +39,19 @@
         # 000000000 = profile id that you can find in the analytics URL, p000000000 :
         #https://analytics.google.com/analytics/web/?hl=en&pli=1#management/Settings/a222222222w1111111111p000000000/   
 ```
-        
  map_key use for Countries Chart "your-key" 
          [Get Api Key](https://developers.google.com/maps/documentation/javascript/get-api-key#step-1-get-an-api-key), 
          [Enable Api Key](https://cloud.google.com/maps-platform/#get-started)
+         
+#### If you don't specify a mapKey the map block will be rendered as chart bar
+         
+4° Add routes :
+```yaml
+[config/routes.yaml]
+
+wd_admin_analytics.data_api:
+  resource: "@WDAdminAnalyticsBundle/Resources/config/routing.yaml"
+```       
 
 ## Configure API : 
 

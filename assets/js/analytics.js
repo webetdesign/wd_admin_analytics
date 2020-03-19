@@ -49,25 +49,25 @@ function loadMap(reload){
     var countries = document.getElementById("data-countries").dataset.values;
     var map = document.getElementById("map_key").dataset.mapkey;
     var map_color = document.getElementById("map_color").dataset.mapcolor;
-    var name = 'countries';
+    var name = map ? 'countriesMap' : 'countriesChart'
 
     if (reload){
         $('#' + name + '-container')[0].innerHTML = "Chargement ...";
         $.post('/api/basic',
             {
-                'start': document.getElementById("countries-container").dataset.start,
+                'start': document.getElementById(name + "-container").dataset.start,
                 'method': name,
-                'site_id': loadSiteId()
+                'site_id': loadSiteId(),
             }).done(function(data) {
 
-            document.getElementById("data-" + name).dataset.values = JSON.stringify(data[loadSiteId()]);
+            document.getElementById("data-countries").dataset.values = JSON.stringify(data[loadSiteId()]);
 
-            var countries = document.getElementById("data-" + name).dataset.values;
+            var countries = document.getElementById("data-countries").dataset.values;
 
-            renderCountries(JSON.parse(countries), map_color    , map);
+            renderCountries(JSON.parse(countries), map_color , map);
         })
     }else{
-        var countries = document.getElementById("data-" + name).dataset.values;
+        var countries = document.getElementById("data-countries").dataset.values;
         renderCountries(JSON.parse(countries), map_color    , map);
     }
 
@@ -223,7 +223,7 @@ function loadData(reload = false){
         loadPages(reload);
     }
 
-    if (document.getElementById("countries-container") != null){
+    if (document.getElementById("countriesMap-container") != null || document.getElementById("countriesChart-container") != null){
         loadMap(reload)
     }
 
@@ -384,7 +384,6 @@ function renderWeekOverWeekChart(data, colors) {
 }
 
 function renderYearOverYearChart(data, colors) {
-
     var values = {
         labels : data.labels,
         datasets : [
@@ -422,14 +421,50 @@ function renderYearOverYearChart(data, colors) {
 }
 
 function renderCountries(data, color, mapKey){
-    google.charts.load('current', {
-        'packages':['geochart'],
-        'mapsApiKey': mapKey,
-    });
 
-    setTimeout(function() {
-        google.charts.setOnLoadCallback(drawMap(data, color));
-    }, 2000)
+    if (mapKey){
+        google.charts.load('current', {
+            'packages':['geochart'],
+            'mapsApiKey': mapKey,
+        });
+
+        setTimeout(function() {
+            google.charts.setOnLoadCallback(drawMap(data, color));
+        }, 2000)
+    }else{
+        if (document.getElementById("countriesMap-container") != null){
+            document.getElementById("countriesMap-container").remove()
+        }
+        var values = {
+            labels : data.labels,
+            datasets : [
+                {
+                    label: "Nombre d'utilisateurs",
+                    backgroundColor : color,
+                    data : data.values
+                }
+            ]
+        };
+
+        var  options = {
+            tooltips: {
+                mode: 'index',
+                intersect: false,
+                callbacks: {
+                    labelColor: function(tooltipItem, chart) {
+                        return {
+                            backgroundColor: colors[tooltipItem.datasetIndex]
+                        }
+                    },
+                }
+            }
+        };
+        new Chart(makeCanvas('countriesChart-container'), {
+            type: 'bar',
+            data: values,
+            options: options
+        });
+    }
 
 }
 
