@@ -421,8 +421,10 @@ function renderYearOverYearChart(data, colors) {
 }
 
 function renderCountries(data, color, mapKey){
-    console.log(mapKey);
     if (mapKey){
+        if (document.getElementById("countriesChart-container") != null){
+            document.getElementById("countriesChart-container").remove()
+        }
         google.charts.load('current', {
             'packages':['geochart'],
             'mapsApiKey': mapKey,
@@ -431,6 +433,8 @@ function renderCountries(data, color, mapKey){
         setTimeout(function() {
             google.charts.setOnLoadCallback(drawMap(data, color));
         }, 2000)
+
+        $("#countriesMap-container").show()
     }else{
         if (document.getElementById("countriesMap-container") != null){
             document.getElementById("countriesMap-container").remove()
