@@ -16,12 +16,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use WebEtDesign\AnalyticsBundle\Services\Analytics;
 
-class Base extends AbstractBlockService
+class Config extends AbstractBlockService
 {
-    /**
-     * @var Analytics
-     */
-    private $analyticsService;
 
     private $mapKey;
 
@@ -34,11 +30,10 @@ class Base extends AbstractBlockService
      * @param EngineInterface $templating
      * @param Analytics $analyticsService
      */
-    public function __construct($name, EngineInterface $templating, Analytics $analyticsService, $mapKey, $names, $ids)
+    public function __construct($name, EngineInterface $templating, $mapKey, $names, $ids)
     {
         parent::__construct($name, $templating);
 
-        $this->analyticsService = $analyticsService;
         $this->mapKey = $mapKey;
         $this->view_names = $names;
         $this->view_ids = $ids;
@@ -53,28 +48,6 @@ class Base extends AbstractBlockService
     {
         $settings = $blockContext->getSettings();
 
-        $blocks = [];
-
-        $this->analyticsService->maxPage = sizeof($settings['colors']);
-
-        foreach ($settings["analytics"] as $block) {
-            $block_name = array_key_first($block);
-
-            $start = key_exists('start', $block[$block_name]) ? $block[$block_name]["start"] : null;
-            $icon = key_exists('icon', $block[$block_name]) ? $block[$block_name]["icon"] : null;
-            $size = key_exists('size', $block[$block_name]) ? $block[$block_name]["size"] : null;
-
-            $method = "get" . ucfirst($block_name);
-            $row = [];
-            $row["template"] = "@WDAdminAnalytics/" . $block_name . ".html.twig";
-            $row["name"] = $block_name;
-            $row["icon"] = $icon;
-            $row["size"] = $size;
-            $row["start"] = $start;
-            $blocks[] = $row;
-        }
-
-
         return $this->renderPrivateResponse("@WDAdminAnalytics/base.html.twig", [
             'map_key' => $this->mapKey,
             'map_color' => $settings['map_color'],
@@ -82,7 +55,6 @@ class Base extends AbstractBlockService
             'week_colors' => json_encode($settings['week_colors']),
             'year_colors' => json_encode($settings['year_colors']),
             'colors' => json_encode($settings['colors']),
-            'blocks' => $blocks,
             'view_names' => $this->view_names,
             'view_ids' => $this->view_ids
         ], $response);
@@ -105,7 +77,6 @@ class Base extends AbstractBlockService
             'week_colors' => ['rgb(255, 077, 077)', 'rgb(230, 000, 000)'],
             'year_colors' => ['rgb(255, 077, 077)', 'rgb(230, 000, 000)'],
             'colors' => ['rgb(255, 102, 102)','rgb(255, 051, 051)','rgb(230, 000, 000)','rgb(179, 000, 000)','rgb(128, 000, 000)'],
-            "analytics" => [],
             "view_names" => []
         ]);
 
@@ -115,7 +86,6 @@ class Base extends AbstractBlockService
         $resolver->setAllowedTypes('users_color', ['string', 'null']);
         $resolver->setAllowedTypes('map_color', ['string', 'null']);
         $resolver->setAllowedTypes('colors', ['array', 'null']);
-        $resolver->setAllowedTypes('analytics', ['array', 'null']);
         $resolver->setAllowedTypes('view_names', ['array', 'null']);
 
 

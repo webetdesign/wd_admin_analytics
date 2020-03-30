@@ -1,10 +1,18 @@
 services:
-  cms.admin.analytics:
-    class: WebEtDesign\AnalyticsBundle\Block\Base
+  cms.admin.analytics.data:
+    class: WebEtDesign\AnalyticsBundle\Block\Data
     arguments:
       - ~
       - '@templating'
       - '@analytics_api.service'
+    tags:
+      - { name: sonata.block }
+
+  cms.admin.analytics.config:
+    class: WebEtDesign\AnalyticsBundle\Block\Config
+    arguments:
+      - ~
+      - '@templating'
       - '%wd_admin_analytics.map_key%'
       - '%wd_admin_analytics.view_names%'
       - '%wd_admin_analytics.view_ids%'

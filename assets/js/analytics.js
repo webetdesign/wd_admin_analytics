@@ -421,7 +421,7 @@ function renderYearOverYearChart(data, colors) {
 }
 
 function renderCountries(data, color, mapKey){
-
+    console.log(mapKey);
     if (mapKey){
         google.charts.load('current', {
             'packages':['geochart'],
@@ -571,7 +571,7 @@ function drawMap(values, color){
         keepAspectRatio: true,
     };
 
-    var chart = new google.visualization.GeoChart(document.getElementById('countries-container'));
+    var chart = new google.visualization.GeoChart(document.getElementById('countriesMap-container'));
 
     chart.draw(data, options);
 }

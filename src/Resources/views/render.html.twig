@@ -1,0 +1,8 @@
+{% for block in blocks %}
+    <div id="block-{{ block.name }}" class="{{ block.size | default('col-md-6') }} col-xs-12" >
+        {% include block.template with {icon : block.icon, start: block.start} %}
+    </div>
+
+    <div id="data-{{ block.name }}"  style="display: none;" data-values="">
+    </div>
+{% endfor %}
