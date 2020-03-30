@@ -106,21 +106,29 @@ You can make different analytics blocks :
 #sonata_admin.yaml
     dashboard:
         blocks:
+        ## config block with paramters. For the view selector
             -  class: col-12
                position: top
                roles: [ROLE_ADMIN]
-               type:     cms.admin.analytics
+               type:     cms.admin.analytics.config
+               settings:
+                   colors: ["rgb(195, 236, 255)","rgb(160, 225, 255)", "rgb(114, 210, 255)", "rgb(063, 194, 255)", "rgb(000, 150, 220)", "rgb(000, 150, 174)"]
+                   week_colors: ["rgb(160, 225, 255)", "rgb(000, 150, 220)"]
+                   year_colors: ["rgb(160, 225, 255)", "rgb(000, 150, 220)"]
+                   users_color: 'rgb(000, 123, 255)'
+                   map_color: '#0077ae'
+
+        ## Data block for analytics. You can add many of this block
+            -  class: col-12
+               position: top
+               roles: [ROLE_ADMIN]
+               type:     cms.admin.analytics.data
                settings:
                    analytics:
                        - devices:
                              size: "col-md-6"
                              icon: "fa-lg fa fa-mobile"
                              start: "2 months ago"
-                   colors: ["rgb(195, 236, 255)","rgb(160, 225, 255)", "rgb(114, 210, 255)", "rgb(063, 194, 255)", "rgb(000, 150, 220)", "rgb(000, 150, 174)"]
-                   week_colors: ["rgb(160, 225, 255)", "rgb(000, 150, 220)"]
-                   year_colors: ["rgb(160, 225, 255)", "rgb(000, 150, 220)"]
-                   users_color: 'rgb(000, 123, 255)'
-                   map_color: '#0077ae'
 ```   
 ### Configuration of a block
  
