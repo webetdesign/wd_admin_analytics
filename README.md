@@ -12,7 +12,7 @@
 ```json
 {
   "require": {
-    webetdesign/wd_admin_analytics: "^1"
+    webetdesign/wd_admin_analytics: "^3"
   }
 }
 ```
