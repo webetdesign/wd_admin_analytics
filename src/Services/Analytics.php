@@ -86,7 +86,7 @@ class Analytics
         $dimension = new Google_Service_AnalyticsReporting_Dimension();
         $dimension->setName("ga:" . $dimension_name);
 
-        $actual = $this->makeRequest([$metric], [$dimension], [$dateRange], $site_id, "formatDataChart", $max);
+        $actual = $this->makeRequest([$metric], [$dimension], [], [$dateRange], $site_id, "formatDataChart", $max);
 
         $dateRange = new Google_Service_AnalyticsReporting_DateRange();
         $dateRange->setStartDate(
@@ -94,7 +94,7 @@ class Analytics
         );
         $dateRange->setEndDate(date('Y-m-d', strtotime(date('Y-m-d', strtotime($start)) . ' -1 day')));
 
-        $history = $this->makeRequest([$metric], [$dimension], [$dateRange],$site_id,  "formatDataChart", $max);
+        $history = $this->makeRequest([$metric], [$dimension], [], [$dateRange],$site_id,  "formatDataChart", $max);
 
         foreach ($actual as $siteId => $fields) {
             foreach ($fields['labels'] as $key => $item) {
@@ -162,8 +162,8 @@ class Analytics
         $dimension_2 = new Google_Service_AnalyticsReporting_Dimension();
         $dimension_2->setName("ga:nthDay");
 
-        $response_this_week = $this->makeRequest([$metric], [$dimension_1, $dimension_2], [$thisWeek], $site_id);
-        $response_last_week = $this->makeRequest([$metric], [$dimension_1, $dimension_2], [$lastWeek], $site_id);
+        $response_this_week = $this->makeRequest([$metric], [$dimension_1, $dimension_2], [], [$thisWeek], $site_id);
+        $response_last_week = $this->makeRequest([$metric], [$dimension_1, $dimension_2], [], [$lastWeek], $site_id);
 
         $response_this_week = $this->getDiffForWeek($response_this_week);
         $response_last_week = $this->getDiffForWeek($response_last_week);
@@ -262,8 +262,8 @@ class Analytics
         $dimension_2 = new Google_Service_AnalyticsReporting_Dimension();
         $dimension_2->setName("ga:nthMonth");
 
-        $response_this_year = $this->makeRequest([$metric], [$dimension_1, $dimension_2], [$thisYear], $site_id);
-        $response_last_year = $this->makeRequest([$metric], [$dimension_1, $dimension_2], [$lastYear], $site_id);
+        $response_this_year = $this->makeRequest([$metric], [$dimension_1, $dimension_2], [], [$thisYear], $site_id);
+        $response_last_year = $this->makeRequest([$metric], [$dimension_1, $dimension_2], [], [$lastYear], $site_id);
 
         $response_this_year = $this->getDiffForYear($response_this_year);
         $response_last_year = $this->getDiffForYear($response_last_year);
@@ -420,7 +420,7 @@ class Analytics
         $d3 = new Google_Service_AnalyticsReporting_Dimension();
         $d3->setName('ga:day');
 
-        $data = $this->makeRequest([$metric], [$d1, $d2, $d3], [$dateRange], $site_id, "formatDataUsers");
+        $data = $this->makeRequest([$metric], [$d1, $d2, $d3], [], [$dateRange], $site_id, "formatDataUsers");
 
         return $data;
     }
@@ -434,7 +434,33 @@ class Analytics
         return $this->getBasicChart("pageviews", "pagePath", $start, $site_id,'yesterday', 10);
     }
 
-    private function makeRequest(array $metrics, array $dimensions, array $dates, $site_id, $method = "formatDataChart",  $max = null)
+    public function getPage($site_id, $path, $start = '1 month ago'){
+        $dateRange = new Google_Service_AnalyticsReporting_DateRange();
+        $dateRange->setStartDate(date('Y-m-d', strtotime($start)));
+        $dateRange->setEndDate(date('Y-m-d', strtotime('yesterday')));
+
+        $metric = new Google_Service_AnalyticsReporting_Metric();
+        $metric->setExpression("ga:uniquePageviews");
+        $metric->setAlias(ucfirst('uniquePageviews'));
+
+        $dimension = new Google_Service_AnalyticsReporting_Dimension();
+        $dimension->setName("ga:pagePath");
+
+        $filter = new \Google_Service_AnalyticsReporting_DimensionFilter();
+        $filter->setDimensionName('ga:pagePath');
+        $filter->setOperator('EXACT');
+        $filter->setExpressions([$path]);
+
+        $clause = new \Google_Service_AnalyticsReporting_DimensionFilterClause();
+        $clause->setFilters([$filter]);
+        $clause->setOperator('OR');
+
+        $actual = $this->makeRequest([$metric], [$dimension], [$clause], [$dateRange], $site_id, "formatDataChart", 10);
+
+        return isset($actual[$site_id]) && isset($actual[$site_id]['total']) ? $actual[$site_id]['total'] : 0;
+    }
+
+    private function makeRequest(array $metrics, array $dimensions, array $dimensions_clause, array $dates, $site_id, $method = "formatDataChart",  $max = null)
     {
         // Create the ReportRequest object.
         $request = new Google_Service_AnalyticsReporting_ReportRequest();
@@ -442,6 +468,7 @@ class Analytics
         $request->setMetrics($metrics);
         $request->setDimensions($dimensions);
         $request->setDateRanges($dates);
+        $request->setDimensionFilterClauses($dimensions_clause);
 
         if (count($metrics) == 1 && count($dimensions) == 1) {
             $order = new Google_Service_AnalyticsReporting_OrderBy();

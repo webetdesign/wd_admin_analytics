@@ -1,9 +1,9 @@
-basic_list:
-  path: /api/basic
+wd_admin_analytics_basic_list:
+  path: /api/analytics/basic
   # the controller value has the format 'controller_class::method_name'
   controller: WebEtDesign\AnalyticsBundle\Controller\DataController::basic
 
-users_list:
-  path: /api/users
+wd_admin_analytics_users_list:
+  path: /api/analytics/users
   # the controller value has the format 'controller_class::method_name'
   controller: WebEtDesign\AnalyticsBundle\Controller\DataController::users

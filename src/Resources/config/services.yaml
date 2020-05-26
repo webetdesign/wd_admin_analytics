@@ -37,3 +37,15 @@ services:
     arguments:
       - '@analytics_api.service'
     tags: ['controller.service_arguments']
+
+  WebEtDesign\AnalyticsBundle\Controller\UrlController:
+    arguments:
+      - '@analytics_api.service'
+    tags: ['controller.service_arguments']
+
+  WebEtDesign\AnalyticsBundle\Twig\ApiTwigExtension:
+    public: true
+    arguments:
+      - '@analytics_api.service'
+    tags:
+      - { name: twig.extension }

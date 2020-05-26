@@ -4,7 +4,7 @@ import Chart from "chart.js"
 function loadDoughnut(name, reload = false){
     if (reload){
         $('#' + name + '-container')[0].innerHTML = "Chargement ...";
-        $.post('/api/basic',
+        $.post('/api/analytics/basic',
             {
                 'start': loadStart(name),
                 'method': name,
@@ -53,7 +53,7 @@ function loadMap(reload){
 
     if (reload){
         $('#' + name + '-container')[0].innerHTML = "Chargement ...";
-        $.post('/api/basic',
+        $.post('/api/analytics/basic',
             {
                 'start': document.getElementById(name + "-container").dataset.start,
                 'method': name,
@@ -88,7 +88,7 @@ function loadUserWeek(reload){
 
     if (reload){
         $('#' + name + '-container')[0].innerHTML = "Chargement ...";
-        $.post('/api/users',
+        $.post('/api/analytics/users',
             {
                 'method': name,
                 'site_id': loadSiteId()
@@ -123,7 +123,7 @@ function loadUserYear(reload){
 
     if (reload){
         $('#' + name + '-container')[0].innerHTML = "Chargement ...";
-        $.post('/api/users',
+        $.post('/api/analytics/users',
             {
                 'method': name,
                 'site_id': loadSiteId()
@@ -148,7 +148,7 @@ function loadPages(reload = false){
 
     if (reload){
         $('#' + name + '-container')[0].innerHTML = "Chargement ...";
-        $.post('/api/basic',
+        $.post('/api/analytics/basic',
             {
                 'start': loadStart(name),
                 'method': name,
@@ -174,7 +174,7 @@ function loadUsers(reload = false){
 
     if (reload){
         $('#' + name + '-container')[0].innerHTML = "Chargement ...";
-        $.post('/api/users',
+        $.post('/api/analytics/users',
             {
                 'method': name,
                 'site_id': loadSiteId()
