@@ -4,13 +4,12 @@ import Chart from "chart.js"
 function loadDoughnut(name, reload = false){
     if (reload){
         $('#' + name + '-container')[0].innerHTML = "Chargement ...";
-        $.post('/api/analytics/basic',
+        $.post('/api/basic',
             {
                 'start': loadStart(name),
                 'method': name,
                 'site_id': loadSiteId()
             }).done(function(data) {
-
             document.getElementById("data-" + name).dataset.values = JSON.stringify(data[loadSiteId()]);
             var container = document.getElementById("data-" + name).dataset.values;
 
@@ -53,7 +52,7 @@ function loadMap(reload){
 
     if (reload){
         $('#' + name + '-container')[0].innerHTML = "Chargement ...";
-        $.post('/api/analytics/basic',
+        $.post('/api/basic',
             {
                 'start': document.getElementById(name + "-container").dataset.start,
                 'method': name,
@@ -88,7 +87,7 @@ function loadUserWeek(reload){
 
     if (reload){
         $('#' + name + '-container')[0].innerHTML = "Chargement ...";
-        $.post('/api/analytics/users',
+        $.post('/api/users',
             {
                 'method': name,
                 'site_id': loadSiteId()
@@ -123,7 +122,7 @@ function loadUserYear(reload){
 
     if (reload){
         $('#' + name + '-container')[0].innerHTML = "Chargement ...";
-        $.post('/api/analytics/users',
+        $.post('/api/users',
             {
                 'method': name,
                 'site_id': loadSiteId()
@@ -148,7 +147,7 @@ function loadPages(reload = false){
 
     if (reload){
         $('#' + name + '-container')[0].innerHTML = "Chargement ...";
-        $.post('/api/analytics/basic',
+        $.post('/api/basic',
             {
                 'start': loadStart(name),
                 'method': name,
@@ -174,7 +173,7 @@ function loadUsers(reload = false){
 
     if (reload){
         $('#' + name + '-container')[0].innerHTML = "Chargement ...";
-        $.post('/api/analytics/users',
+        $.post('/api/users',
             {
                 'method': name,
                 'site_id': loadSiteId()

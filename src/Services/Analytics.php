@@ -366,9 +366,9 @@ class Analytics
      * @param string $start
      * @return array
      */
-    public function getCountriesMap($site_id, $start = "first day of january this year")
+    public function getCountriesMap($site_id, $start = "first day of january this year", $max = 30)
     {
-        $response = $this->getBasicChart("users", "country", $start, $site_id,'yesterday' ,30);
+        $response = $this->getBasicChart("users", "country", $start, $site_id,'yesterday' ,$max);
         $data     = [];
 
         foreach ($response as $row_key => $row) {
@@ -393,7 +393,7 @@ class Analytics
      */
     public function getCountriesChart($site_id, $start = "first day of january this year")
     {
-        return $this->getBasicChart("users", "country", $start, $site_id,'yesterday' ,30);
+        return $this->getBasicChart("users", "country", $start, $site_id,'yesterday' ,10);
     }
 
     /**
