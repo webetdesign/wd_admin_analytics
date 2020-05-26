@@ -1,6 +1,8 @@
 ## Twig Functions
 
-#### Unique view of page
+#### Views of page
+
+If a same user came many times, it will be counted only once
 
 ```twig
     view_for_path(analytics_view_id, path, start)
