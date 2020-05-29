@@ -93,7 +93,6 @@ class Analytics
             date('Y-m-d', strtotime(date('Y-m-d', strtotime($start)) . $start))
         );
         $dateRange->setEndDate(date('Y-m-d', strtotime(date('Y-m-d', strtotime($start)) . ' -1 day')));
-
         $history = $this->makeRequest([$metric], [$dimension], [], [$dateRange],$site_id,  "formatDataChart", $max);
 
         foreach ($actual as $siteId => $fields) {
@@ -102,7 +101,9 @@ class Analytics
                     return $actual;
                 } else {
                     $id                            = array_search($item, $history[$siteId]['labels']);
-                    $actual[$siteId]['diff'][$key] = $actual[$siteId]['percents'][$key] - $history[$siteId]['percents'][$id];
+                    $ac_value = intval($actual[$siteId]['values'][$key]);
+                    $h_value = intval($history[$siteId]['values'][$key]);
+                    $actual[$siteId]['diff'][$key] = (round((($ac_value - $h_value) / $h_value) * 100, 4));
                 }
             }
         }
@@ -339,7 +340,7 @@ class Analytics
      */
     public function getDevices($site_id, $start = "30 days ago")
     {
-        $data = $this->getBasicChart("visits", "deviceCategory", $start, $site_id);
+        $data = $this->getBasicChart("sessions", "deviceCategory", $start, $site_id);
 
         foreach ($data as $row_key => $row) {
             foreach ($row["labels"] as $key => $label) {
