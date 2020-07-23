@@ -66,7 +66,7 @@ wd_admin_analytics.data_api:
 ```            
    4° Create ENV variable with the path of your JSON file :
 ```dotenv        
-   GOOGLE_ANALYTICS_JSON_KEY=var/analytics.json        
+   GOOGLE_ANALYTICS_JSON_KEY=analytics.json        
 ```        
    5° In the json file, copy the client_email and add it to the granted users of you analytics account
         
@@ -74,6 +74,21 @@ wd_admin_analytics.data_api:
             -> Administration
             -> Gestion des Utilisateurs
             -> +
+   6° You can create a fake file by default at the root of the project:
+   ````json
+     {
+       "type": "service_account",
+       "project_id": "null",
+       "private_key_id": "",
+       "private_key": "",
+       "client_email": "",
+       "client_id": "",
+       "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+       "token_uri": "https://oauth2.googleapis.com/token",
+       "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+       "client_x509_cert_url": ""
+     } 
+````         
 ## Enable Styles :    
 
 Execute :
