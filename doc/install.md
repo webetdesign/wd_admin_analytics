@@ -88,7 +88,11 @@ wd_admin_analytics.data_api:
        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
        "client_x509_cert_url": ""
      } 
-````         
+````  
+   7° Update rsync_exclude
+   ````text
+    var/*.json
+````     
 ## Enable Styles :    
 
 Execute :
