@@ -54,7 +54,7 @@ function loadMap(reload){
         $('#' + name + '-container')[0].innerHTML = "Chargement ...";
         $.post('/api/basic',
             {
-                'start': document.getElementById(name + "-container").dataset.start,
+                'start': loadStart('countries'),
                 'method': name,
                 'site_id': loadSiteId(),
             }).done(function(data) {
@@ -592,4 +592,4 @@ function makeCanvas(id) {
     return ctx;
 }
 
-export {loadDoughnut, loadData, loadPages, loadUsers}
+export {loadDoughnut, loadData, loadPages, loadUsers, loadMap}

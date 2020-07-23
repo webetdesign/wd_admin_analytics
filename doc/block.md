@@ -35,7 +35,7 @@ You can make different analytics blocks :
                        - devices:
                              size: "col-md-6"
                              icon: "fa-lg fa fa-mobile"
-                             start: "2 months ago"
+                             start: "28 days ago"
 ```   
 ### Configuration of a block
  

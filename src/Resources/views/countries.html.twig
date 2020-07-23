@@ -4,6 +4,8 @@
             <i class="{{ icon }}"></i>
         {% endif %}
         <h3 class="box-title ">Pays </h3>
+        {% include '@WDAdminAnalytics/select_start.html.twig' with {'default' : start | default(''), 'name' : 'countries'} %}
+
     </div>
     <div class="box-body">
         <div id="countriesMap-container" data-start="{{ start }}" style="width: 100%; height: 300px; display: none">
