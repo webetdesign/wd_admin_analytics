@@ -62,11 +62,11 @@ wd_admin_analytics.data_api:
    3° Rename the google_apiclient.yaml file to google-analytics-api and replace content by : 
 ```yaml
     google_analytics_api:
-        google_analytics_json_key: "%env(resolve:GOOGLE_ANALYTICS_JSON_KEY)%"
+        google_analytics_json_key: "%kernel.project_dir%/%env(resolve:GOOGLE_ANALYTICS_JSON_KEY)%"
 ```            
    4° Create ENV variable with the path of your JSON file :
 ```dotenv        
-   GOOGLE_ANALYTICS_JSON_KEY=/must/be/asbolute/path/analyctics.json        
+   GOOGLE_ANALYTICS_JSON_KEY=var/analytics.json        
 ```        
    5° In the json file, copy the client_email and add it to the granted users of you analytics account
         
