@@ -66,7 +66,7 @@ wd_admin_analytics.data_api:
 ```            
    4° Create ENV variable with the path of your JSON file :
 ```dotenv        
-   GOOGLE_ANALYTICS_JSON_KEY=../var/analytics-259608.json        
+   GOOGLE_ANALYTICS_JSON_KEY=/must/be/asbolute/path/analyctics.json        
 ```        
    5° In the json file, copy the client_email and add it to the granted users of you analytics account
         
