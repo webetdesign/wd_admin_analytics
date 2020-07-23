@@ -1,7 +1,7 @@
 import Chart from "chart.js"
 // import './gapi.js';
 
-function loadDoughnut(name, reload = false){
+function loadGraph(name, reload = false, type = 'doughnut', label = null){
     if (reload){
         $('#' + name + '-container')[0].innerHTML = "Chargement ...";
         $.post('/api/basic',
@@ -13,12 +13,19 @@ function loadDoughnut(name, reload = false){
             document.getElementById("data-" + name).dataset.values = JSON.stringify(data[loadSiteId()]);
             var container = document.getElementById("data-" + name).dataset.values;
 
-            renderDoughnut(JSON.parse(container), getColors(), name);
+            if (type == 'doughnut'){
+                renderDoughnut(JSON.parse(container), getColors(), name);
+            }else if(type == 'bar'){
+                renderBar(JSON.parse(container), getColors()[0], name, label);
+            }
         })
     }else{
         var container = document.getElementById("data-" + name).dataset.values;
-
-        renderDoughnut(JSON.parse(container), getColors(), name);
+        if (type == 'doughnut'){
+            renderDoughnut(JSON.parse(container), getColors(), name);
+        }else if(type == 'bar'){
+            renderBar(JSON.parse(container), getColors()[0], name, label);
+        }
     }
 
 }
@@ -199,7 +206,7 @@ function loadData(reload = false){
     var colors = getColors();
 
     if (document.getElementById("browsers-container") != null){
-        loadDoughnut('browsers', reload)
+        loadGraph('browsers', reload)
     }
 
     if (document.getElementById('userWeek-container') != null){
@@ -211,11 +218,11 @@ function loadData(reload = false){
     }
 
     if (document.getElementById("sources-container") != null){
-        loadDoughnut('sources', reload)
+        loadGraph('sources', reload, document.getElementById("select_start_sources").dataset.type, document.getElementById("select_start_sources").dataset.label)
     }
 
     if (document.getElementById("devices-container") != null){
-        loadDoughnut('devices', reload)
+        loadGraph('devices', reload)
     }
 
     if (document.getElementById("pages-container") != null){
@@ -335,6 +342,48 @@ function renderDoughnut(response, colors, name) {
     $('#' + name + '-legend').html(chart.generateLegend());
 }
 
+function renderBar(data, color, name, label){
+    let labels = [];
+
+    data.labels.forEach((item, index) => {
+        if (Array.isArray(item)){
+            labels.push(item[0])
+        }else{
+            labels.push(item)
+        }
+    })
+
+    var values = {
+        labels : labels,
+        datasets : [
+            {
+                label: label,
+                backgroundColor : color,
+                data : data.values
+            }
+        ]
+    };
+
+    var  options = {
+        tooltips: {
+            mode: 'index',
+            intersect: false,
+            callbacks: {
+                labelColor: function(tooltipItem, chart) {
+                    return {
+                        backgroundColor: colors[tooltipItem.datasetIndex]
+                    }
+                },
+            }
+        }
+    };
+    new Chart(makeCanvas(name + '-container'), {
+        type: 'bar',
+        data: values,
+        options: options
+    });
+}
+
 function renderWeekOverWeekChart(data, colors) {
 
     var values = {
@@ -438,35 +487,8 @@ function renderCountries(data, color, mapKey){
         if (document.getElementById("countriesMap-container") != null){
             document.getElementById("countriesMap-container").remove()
         }
-        var values = {
-            labels : data.labels,
-            datasets : [
-                {
-                    label: "Nombre d'utilisateurs",
-                    backgroundColor : color,
-                    data : data.values
-                }
-            ]
-        };
 
-        var  options = {
-            tooltips: {
-                mode: 'index',
-                intersect: false,
-                callbacks: {
-                    labelColor: function(tooltipItem, chart) {
-                        return {
-                            backgroundColor: colors[tooltipItem.datasetIndex]
-                        }
-                    },
-                }
-            }
-        };
-        new Chart(makeCanvas('countriesChart-container'), {
-            type: 'bar',
-            data: values,
-            options: options
-        });
+        renderBar(data, color, 'countriesChart', "Nombre d'utilisateurs")
     }
 
 }
@@ -592,4 +614,4 @@ function makeCanvas(id) {
     return ctx;
 }
 
-export {loadDoughnut, loadData, loadPages, loadUsers, loadMap}
+export {loadGraph, loadData, loadPages, loadUsers, loadMap}

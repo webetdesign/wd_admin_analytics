@@ -316,7 +316,7 @@ class Analytics
      */
     public function getSources($site_id, $start = "first day of january this year")
     {
-        $data = $this->getBasicChart("users", "channelGrouping", $start, $site_id);
+        $data = $this->getBasicChart("sessions", "source", $start, $site_id);
 
         foreach ($data as $row_key => $row) {
             foreach ($row["labels"] as $key => $label) {

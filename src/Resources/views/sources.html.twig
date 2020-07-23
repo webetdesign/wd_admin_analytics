@@ -3,8 +3,8 @@
         {% if icon is defined %}
             <i class="{{ icon }}"></i>
         {% endif %}
-        <h3 class="box-title ">Canal de trafic </h3>
-        {% include '@WDAdminAnalytics/select_start.html.twig' with {'default' : start | default(''), 'name' : 'sources'} %}
+        <h3 class="box-title ">Source de trafic </h3>
+        {% include '@WDAdminAnalytics/select_start.html.twig' with {'default' : start | default(''), 'name' : 'sources', 'type': 'bar', 'label': 'Nombre d\'utilisateurs'} %}
     </div>
     <div class="box-body">
         <figure class="Chartjs-figure" id="sources-container"></figure>
