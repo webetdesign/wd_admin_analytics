@@ -12,7 +12,6 @@ function loadGraph(name, reload = false, type = 'doughnut', label = null){
             }).done(function(data) {
             document.getElementById("data-" + name).dataset.values = JSON.stringify(data[loadSiteId()]);
             var container = document.getElementById("data-" + name).dataset.values;
-
             if (type == 'doughnut'){
                 renderDoughnut(JSON.parse(container), getColors(), name);
             }else if(type == 'bar'){

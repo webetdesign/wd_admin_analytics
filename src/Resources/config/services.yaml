@@ -1,10 +1,14 @@
 services:
   cms.admin.analytics.data:
     class: WebEtDesign\AnalyticsBundle\Block\Data
+    autowire: true
     arguments:
-      - ~
+      - 'Analytics Data Block'
       - '@templating'
       - '@analytics_api.service'
+      - '@doctrine.orm.default_entity_manager'
+      - '@security.helper'
+      - '@session.flash_bag'
     tags:
       - { name: sonata.block }
 
@@ -39,9 +43,14 @@ services:
     tags: ['controller.service_arguments']
 
 
-  WebEtDesign\AnalyticsBundle\Twig\ApiTwigExtension:
+  WebEtDesign\AnalyticsBundle\Twig\TwigExtension:
     public: true
     arguments:
       - '@analytics_api.service'
     tags:
       - { name: twig.extension }
+
+  WebEtDesign\AnalyticsBundle\Repository\:
+    resource: '../../Repository'
+    autowire: true
+    tags: ['doctrine.repository_service']

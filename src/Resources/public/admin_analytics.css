@@ -234,7 +234,7 @@ limitations under the License.
   .pages-table tr:not(:first-child) {
     border-top: 1px solid darkgray; }
   .pages-table tr:first-child td {
-    color: black !important; }
+    color: rgba(0, 0, 0, 0.54) !important; }
   .pages-table td:not(:first-child) {
     padding: 5px 0; }
   .pages-table td:nth-child(2) {

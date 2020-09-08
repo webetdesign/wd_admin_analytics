@@ -86,14 +86,14 @@ class Analytics
         $dimension = new Google_Service_AnalyticsReporting_Dimension();
         $dimension->setName("ga:" . $dimension_name);
 
-        $actual = $this->makeRequest([$metric], [$dimension], [], [$dateRange], $site_id, "formatDataChart", $max);
+        $actual = $this->makeRequest([$metric], [$dimension], [], [$dateRange], $site_id, "formatDataChart", $max, true);
 
         $dateRange = new Google_Service_AnalyticsReporting_DateRange();
         $dateRange->setStartDate(
             date('Y-m-d', strtotime(date('Y-m-d', strtotime($start)) . $start))
         );
         $dateRange->setEndDate(date('Y-m-d', strtotime(date('Y-m-d', strtotime($start)) . ' -1 day')));
-        $history = $this->makeRequest([$metric], [$dimension], [], [$dateRange], $site_id, "formatDataChart", $max);
+        $history = $this->makeRequest([$metric], [$dimension], [], [$dateRange], $site_id, "formatDataChart", $max, true);
 
         foreach ($actual as $siteId => $fields) {
             foreach ($fields['labels'] as $key => $item) {
@@ -453,7 +453,7 @@ class Analytics
         return isset($actual[$site_id]) && isset($actual[$site_id]['total']) ? $actual[$site_id]['total'] : 0;
     }
 
-    private function makeRequest(array $metrics, array $dimensions, array $dimensions_clause, array $dates, $site_id, $method = "formatDataChart", $max = null)
+    private function makeRequest(array $metrics, array $dimensions, array $dimensions_clause, array $dates, $site_id, $method = "formatDataChart", $max = null, $order = false)
     {
         // Create the ReportRequest object.
         $request = new Google_Service_AnalyticsReporting_ReportRequest();
@@ -463,11 +463,13 @@ class Analytics
         $request->setDateRanges($dates);
         $request->setDimensionFilterClauses($dimensions_clause);
 
-        $order = new Google_Service_AnalyticsReporting_OrderBy();
-        $order->setFieldName($metrics[0]->getExpression());
-        $order->setOrderType("VALUE");
-        $order->setSortOrder("DESCENDING");
-        $request->setOrderBys($order);
+        if ($order){
+            $order = new Google_Service_AnalyticsReporting_OrderBy();
+            $order->setFieldName($metrics[0]->getExpression());
+            $order->setOrderType("VALUE");
+            $order->setSortOrder("DESCENDING");
+            $request->setOrderBys($order);
+        }
 
         if ($max) {
             $request->setPageSize($max);

@@ -4,9 +4,10 @@ namespace WebEtDesign\AnalyticsBundle\Twig;
 
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
+use WebEtDesign\AnalyticsBundle\Enum\BlockStartEnum;
 use WebEtDesign\AnalyticsBundle\Services\Analytics;
 
-class ApiTwigExtension extends AbstractExtension
+class TwigExtension extends AbstractExtension
 {
 
     /**
@@ -26,6 +27,7 @@ class ApiTwigExtension extends AbstractExtension
     {
         return [
             new TwigFunction('view_for_path', [$this, 'getPathView']),
+            new TwigFunction('select_start', [$this, 'getStartChoices']),
         ];
     }
 
@@ -35,5 +37,9 @@ class ApiTwigExtension extends AbstractExtension
         }catch (\Exception $e){
             return 0;
         }
+    }
+
+    public function getStartChoices(){
+        return BlockStartEnum::$choices;
     }
 }
