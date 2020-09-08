@@ -11,7 +11,7 @@
 
 .pages-table{
     width: 100%;
-    table-layout: fixed;
+    table-layout: auto;
     tr {
         font-size: 15px;
     }
@@ -20,9 +20,26 @@
         border-top: 1px solid darkgray;
     }
 
+    tr:first-child{
+        td {
+            color: black !important;
+        }
+    }
+
     & td:not(:first-child){
-        float: right;
-        padding-right: 20%;
+        padding: 5px 0;
+    }
+
+    & td:nth-child(2){
+        color: #3499ff;
+    }
+
+    & td:nth-child(3){
+        color: #00b894;
+    }
+
+    & td:nth-child(4){
+        color: #d70001;
     }
 
     td {

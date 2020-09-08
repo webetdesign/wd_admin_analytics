@@ -48,7 +48,7 @@ function loadSiteId(){
 }
 
 function loadStart(name){
-    return $("#select_start_" + name)[0].selectedOptions[0].value;
+    return $("#select_start_" + name).length > 0 ? $("#select_start_" + name)[0].selectedOptions[0].value : '7 days ago';
 }
 
 function loadMap(reload){
@@ -538,12 +538,16 @@ function renderPages(data){
 
     var html = '<table class="pages-table">';
 
-    html += '<tr><td></td><td>Vues</td></tr>'
+    html += '<tr><td></td><td>Vues</td><td>Entrées</td><td>Sorties</td></tr>'
 
+    let label = '';
     for (let i = 0; i < data.labels.length; i++) {
+        label = data.labels[i];
         html += '<tr>' +
-            '<td>' + data.labels[i] + '</td>' +
-            '<td>' + data.values[i] + '</td>' +
+            '<td>' + label + '</td>' +
+            '<td>' + data.values[label][0] + '</td>' +
+            '<td>' + data.values[label][1] + '</td>' +
+            '<td>' + data.values[label][2] + '</td>' +
             '</tr>';
     }
 

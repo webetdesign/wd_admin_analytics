@@ -60,7 +60,7 @@ class Analytics
         $this->client           = $analyticsService->getClient();
         $this->analyticsReport  = new Google_Service_AnalyticsReporting($this->client);
         $this->maxPage          = $maxPage;
-        $this->slugify = new Slugify();
+        $this->slugify          = new Slugify();
     }
 
     /**
@@ -93,7 +93,7 @@ class Analytics
             date('Y-m-d', strtotime(date('Y-m-d', strtotime($start)) . $start))
         );
         $dateRange->setEndDate(date('Y-m-d', strtotime(date('Y-m-d', strtotime($start)) . ' -1 day')));
-        $history = $this->makeRequest([$metric], [$dimension], [], [$dateRange],$site_id,  "formatDataChart", $max);
+        $history = $this->makeRequest([$metric], [$dimension], [], [$dateRange], $site_id, "formatDataChart", $max);
 
         foreach ($actual as $siteId => $fields) {
             foreach ($fields['labels'] as $key => $item) {
@@ -101,8 +101,8 @@ class Analytics
                     return $actual;
                 } else {
                     $id                            = array_search($item, $history[$siteId]['labels']);
-                    $ac_value = intval($actual[$siteId]['values'][$key]);
-                    $h_value = intval($history[$siteId]['values'][$key]);
+                    $ac_value                      = intval($actual[$siteId]['values'][$key]);
+                    $h_value                       = intval($history[$siteId]['values'][$key]);
                     $actual[$siteId]['diff'][$key] = (round((($ac_value - $h_value) / $h_value) * 100, 4));
                 }
             }
@@ -123,9 +123,9 @@ class Analytics
 
         foreach ($data as $row_key => $row) {
             foreach ($row["labels"] as $key => $label) {
-                $icon = 'fa-2x fa fa-' . $this->slugify->slugify($label);
+                $icon                = 'fa-2x fa fa-' . $this->slugify->slugify($label);
                 $row["labels"][$key] = [$label, $icon];
-                $data[$row_key] = $row;
+                $data[$row_key]      = $row;
             }
         }
 
@@ -369,7 +369,7 @@ class Analytics
      */
     public function getCountriesMap($site_id, $start = "first day of january this year", $max = 30)
     {
-        $response = $this->getBasicChart("users", "country", $start, $site_id,'yesterday' ,$max);
+        $response = $this->getBasicChart("users", "country", $start, $site_id, 'yesterday', $max);
         $data     = [];
 
         foreach ($response as $row_key => $row) {
@@ -394,7 +394,7 @@ class Analytics
      */
     public function getCountriesChart($site_id, $start = "first day of january this year")
     {
-        return $this->getBasicChart("users", "country", $start, $site_id,'yesterday' ,10);
+        return $this->getBasicChart("users", "country", $start, $site_id, 'yesterday', 10);
     }
 
     /**
@@ -426,16 +426,8 @@ class Analytics
         return $data;
     }
 
-    /**
-     * @param $site_id
-     * @param string $start
-     * @return array
-     */
-    public function getPages($site_id, $start = "30 days ago"){
-        return $this->getBasicChart("pageviews", "pagePath", $start, $site_id,'yesterday', 10);
-    }
-
-    public function getPage($site_id, $path, $start = '1 month ago'){
+    public function getPage($site_id, $path, $start = '1 month ago')
+    {
         $dateRange = new Google_Service_AnalyticsReporting_DateRange();
         $dateRange->setStartDate(date('Y-m-d', strtotime($start)));
         $dateRange->setEndDate(date('Y-m-d', strtotime('yesterday')));
@@ -461,7 +453,7 @@ class Analytics
         return isset($actual[$site_id]) && isset($actual[$site_id]['total']) ? $actual[$site_id]['total'] : 0;
     }
 
-    private function makeRequest(array $metrics, array $dimensions, array $dimensions_clause, array $dates, $site_id, $method = "formatDataChart",  $max = null)
+    private function makeRequest(array $metrics, array $dimensions, array $dimensions_clause, array $dates, $site_id, $method = "formatDataChart", $max = null)
     {
         // Create the ReportRequest object.
         $request = new Google_Service_AnalyticsReporting_ReportRequest();
@@ -471,13 +463,11 @@ class Analytics
         $request->setDateRanges($dates);
         $request->setDimensionFilterClauses($dimensions_clause);
 
-        if (count($metrics) == 1 && count($dimensions) == 1) {
-            $order = new Google_Service_AnalyticsReporting_OrderBy();
-            $order->setFieldName($metrics[0]->getExpression());
-            $order->setOrderType("VALUE");
-            $order->setSortOrder("DESCENDING");
-            $request->setOrderBys($order);
-        }
+        $order = new Google_Service_AnalyticsReporting_OrderBy();
+        $order->setFieldName($metrics[0]->getExpression());
+        $order->setOrderType("VALUE");
+        $order->setSortOrder("DESCENDING");
+        $request->setOrderBys($order);
 
         if ($max) {
             $request->setPageSize($max);
@@ -513,6 +503,62 @@ class Analytics
                 array_push($data["values"], $value);
                 array_push($data["percents"], $prct);
                 array_push($data["labels"], ucfirst($row->getDimensions()[0]));
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param string $start
+     * @param string $site_id
+     * @return array
+     */
+    public function getPages($site_id, $start = "30 days ago")
+    {
+        $max = 10;
+
+        $dateRange = new Google_Service_AnalyticsReporting_DateRange();
+        $dateRange->setStartDate(date('Y-m-d', strtotime($start)));
+        $dateRange->setEndDate(date('Y-m-d', strtotime('yesterday')));
+
+        $metric = new Google_Service_AnalyticsReporting_Metric();
+        $metric->setExpression("ga:pageviews");
+        $metric->setAlias(ucfirst('pageviews'));
+
+        $metric_2 = new Google_Service_AnalyticsReporting_Metric();
+        $metric_2->setExpression("ga:entrances");
+        $metric_2->setAlias(ucfirst('entrances'));
+
+        $metric_3 = new Google_Service_AnalyticsReporting_Metric();
+        $metric_3->setExpression("ga:exits");
+        $metric_3->setAlias(ucfirst('exits'));
+
+        $dimension = new Google_Service_AnalyticsReporting_Dimension();
+        $dimension->setName("ga:pagePath");
+
+        $actual = $this->makeRequest([$metric, $metric_2, $metric_3], [$dimension], [], [$dateRange], $site_id, "formatPages", $max);
+
+        return $actual;
+    }
+
+    private function formatPages(Google_Response $response)
+    {
+        $data = [
+            "labels" => [],
+            "values" => []
+        ];
+
+        /** @var Google_Report $report */
+        foreach ($response->getReports() as $report) {
+            /** @var Google_Service_AnalyticsReporting_ReportRow $row */
+            foreach ($report->getData()->getRows() as $row) {
+                $label = ucfirst($row->getDimensions()[0]);
+                $data["values"][$label] = [];
+                foreach ($row->getMetrics()[0]->getValues() as $value) {
+                    array_push($data["values"][$label], number_format($value, 0, ',', ' '));
+                }
+                array_push($data["labels"], $label);
             }
         }
 

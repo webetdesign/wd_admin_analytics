@@ -228,14 +228,21 @@ limitations under the License.
 
 .pages-table {
   width: 100%;
-  table-layout: fixed; }
+  table-layout: auto; }
   .pages-table tr {
     font-size: 15px; }
   .pages-table tr:not(:first-child) {
     border-top: 1px solid darkgray; }
+  .pages-table tr:first-child td {
+    color: black !important; }
   .pages-table td:not(:first-child) {
-    float: right;
-    padding-right: 20%; }
+    padding: 5px 0; }
+  .pages-table td:nth-child(2) {
+    color: #3499ff; }
+  .pages-table td:nth-child(3) {
+    color: #00b894; }
+  .pages-table td:nth-child(4) {
+    color: #d70001; }
   .pages-table td {
     padding: 2px 0; }
 
