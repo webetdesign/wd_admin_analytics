@@ -113,7 +113,6 @@ class Data extends AbstractBlockService
             $this->flashBag->add('error', 'La configuration du bundle Analytics n\'est plus à jour. Vous devez utilisé le crud pour définir les blocks. (voir documentation)');
         }
 
-        dump($blocks);
         return $this->renderPrivateResponse("@WDAdminAnalytics/render.html.twig", [
             'blocks' => $blocks,
         ], $response);
