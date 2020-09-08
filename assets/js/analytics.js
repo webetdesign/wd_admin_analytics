@@ -538,7 +538,7 @@ function renderPages(data){
 
     var html = '<table class="pages-table">';
 
-    html += '<tr><td></td><td>Vues</td><td>Entrées</td><td>Sorties</td></tr>'
+    html += '<tr><td>Page</td><td>Vues</td><td>Entrées</td><td>Sorties</td></tr>'
 
     let label = '';
     for (let i = 0; i < data.labels.length; i++) {
