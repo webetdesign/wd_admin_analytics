@@ -126,3 +126,15 @@ Defined site_id as global variable
 globals:
     [...]
     analytics_view_id: '%env(GOOGLE_ANALYTICS_VIEW_ID)%'
+```
+
+## Enable admin block crud : 
+```yaml
+sonata_admin:
+  dashboard:
+    groups:
+       admin:
+          [...]
+          items:           
+            - cms.admin.analytics.block
+```
