@@ -128,7 +128,7 @@ globals:
     analytics_view_id: '%env(GOOGLE_ANALYTICS_VIEW_ID)%'
 ```
 
-## Enable admin block crud : 
+## Enable admin  crud : 
 ```yaml
 sonata_admin:
   dashboard:
@@ -137,4 +137,5 @@ sonata_admin:
           [...]
           items:           
             - cms.admin.analytics.block
+            - cms.admin.analytics.configuration
 ```

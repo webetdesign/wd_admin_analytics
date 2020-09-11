@@ -113,8 +113,8 @@ final class ConfigAdmin extends AbstractAdmin
 
 
            if ($config->getId() !== null){
-               if ($config->getCode() === ConfigTypeEnum::DIFF_COLORS && count($event->getData()['value']) > 2){
-                   $event->getForm()->addError(new FormError('Vous ne pouvez mettre que deux valeurs pour ce type'));
+               if ($config->getCode() === ConfigTypeEnum::DIFF_COLORS && count($event->getData()['value']) !== 2){
+                   $event->getForm()->addError(new FormError('Vous devez mettre deux valeurs pour ce type'));
                }
            }
         });
