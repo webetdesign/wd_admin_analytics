@@ -7,7 +7,9 @@ use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\Config\FileLocator;
 use WebEtDesign\AnalyticsBundle\Admin\BlockAdmin;
+use WebEtDesign\AnalyticsBundle\Admin\ConfigAdmin;
 use WebEtDesign\AnalyticsBundle\Entity\Block;
+use WebEtDesign\AnalyticsBundle\Entity\Config;
 
 class WDAdminAnalyticsExtension extends Extension
 {
@@ -26,8 +28,10 @@ class WDAdminAnalyticsExtension extends Extension
         $container->setParameter('wd_admin_analytics.map_key', $config['parameters']['map_key']);
 
         $container->setParameter('wd_admin_analytics.entity.block', Block::class);
+        $container->setParameter('wd_admin_analytics.entity.config', Config::class);
 
         $container->setParameter('wd_admin_analytics.admin.block', BlockAdmin::class);
+        $container->setParameter('wd_admin_analytics.admin.configuration', ConfigAdmin::class);
 
 
     }

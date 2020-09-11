@@ -5,3 +5,10 @@ services:
     tags:
       - { name: sonata.admin, manager_type: orm, group: Analytics, label: 'Blocks analytics'}
     public: true
+
+  cms.admin.analytics.configuration:
+    class: '%wd_admin_analytics.admin.configuration%'
+    arguments: [~, '%wd_admin_analytics.entity.config%', ~, '@doctrine.orm.default_entity_manager']
+    tags:
+      - { name: sonata.admin, manager_type: orm, group: Analytics, label: 'Configuration analytics'}
+    public: true

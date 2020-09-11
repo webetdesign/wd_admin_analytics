@@ -539,7 +539,7 @@ class Analytics
         $dimension = new Google_Service_AnalyticsReporting_Dimension();
         $dimension->setName("ga:pagePath");
 
-        $actual = $this->makeRequest([$metric, $metric_2, $metric_3], [$dimension], [], [$dateRange], $site_id, "formatPages", $max);
+        $actual = $this->makeRequest([$metric, $metric_2, $metric_3], [$dimension], [], [$dateRange], $site_id, "formatPages", $max, true);
 
         return $actual;
     }
