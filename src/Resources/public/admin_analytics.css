@@ -223,6 +223,20 @@ limitations under the License.
   padding-left: 0 !important;
   padding-top: 0 !important; }
 
+.block-analytics {
+  /* Using plain CSS */ }
+  @media (min-width: 960px) {
+    .block-analytics {
+      height: 50vh;
+      margin-bottom: 50px; } }
+
+.bg-block-analytics {
+  height: 100%;
+  overflow: auto; }
+
+.Chartjs-legend {
+  overflow: auto; }
+
 .doughnut-legend table {
   width: 100%; }
 
