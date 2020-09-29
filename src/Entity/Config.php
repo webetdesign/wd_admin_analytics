@@ -80,8 +80,14 @@ class Config
         return json_decode( $this->value, true);
     }
 
+    public function setValueArray($value){
+        $this->value = json_encode($value);
+    }
+
     public function getValueFormated(){
-        foreach ($this->getValueArray() as $datum) {
+        $array = $this->getValueArray();
+        if (!$array) return [];
+        foreach ($array as $datum) {
           $formatted[] = $this->formatColor($datum);
         }
 

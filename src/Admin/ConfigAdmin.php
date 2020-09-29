@@ -72,7 +72,7 @@ final class ConfigAdmin extends AbstractAdmin
             /** @var ConfigTypeEnum */
             switch ($this->subject->getCode()){
                 case ConfigTypeEnum::COLORS:
-                    $formMapper->add('value', CollectionType::class, [
+                    $formMapper->add('valueArray', CollectionType::class, [
                         'label' => 'Valeur',
                         'entry_type' => ColorType::class,
                         'allow_add' => true,
@@ -85,7 +85,7 @@ final class ConfigAdmin extends AbstractAdmin
                     ]);
                     break;
                 case ConfigTypeEnum::DIFF_COLORS:
-                    $formMapper->add('value', CollectionType::class, [
+                    $formMapper->add('valueArray', CollectionType::class, [
                         'label' => 'Valeur',
                         'entry_type' => ColorType::class,
                         'allow_add' => true,
@@ -113,7 +113,7 @@ final class ConfigAdmin extends AbstractAdmin
 
 
            if ($config->getId() !== null){
-               if ($config->getCode() === ConfigTypeEnum::DIFF_COLORS && count($event->getData()['value']) !== 2){
+               if ($config->getCode() === ConfigTypeEnum::DIFF_COLORS && count($event->getData()['valueArray']) !== 2){
                    $event->getForm()->addError(new FormError('Vous devez mettre deux valeurs pour ce type'));
                }
            }
