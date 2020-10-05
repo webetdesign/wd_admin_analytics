@@ -42,6 +42,7 @@ services:
   WebEtDesign\AnalyticsBundle\Controller\DataController:
     arguments:
       - '@analytics_api.service'
+      - '%env(GOOGLE_ANALYTICS_VIEW_ID)%'
     tags: ['controller.service_arguments']
 
 

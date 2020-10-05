@@ -16,10 +16,12 @@ class DataController extends AbstractController
     /**
      * DataController constructor.
      * @param Analytics $analytics
+     * @param string $base_view_id
      */
-    public function __construct(Analytics $analytics)
+    public function __construct(Analytics $analytics, string $base_view_id)
     {
         $this->analytics = $analytics;
+        $this->base_view_id = $base_view_id;
     }
 
     /**
@@ -41,6 +43,21 @@ class DataController extends AbstractController
         return new JsonResponse($this->analytics->$method(
             $request->request->get('site_id'))
         );
+    }
+
+    public function page(Request $request){
+        $path = $request->request->get('path', null);
+        $start = $request->request->get('start', null);
+
+        try{
+            $views = $start ? $this->analytics->getPage($this->base_view_id, $path, $start) : $this->analytics->getPage($this->base_view_id, $path);
+        }catch (\Exception $e){
+            $views = 0;
+        }
+
+        return new JsonResponse([
+            'views' => $views
+        ]);
     }
 
 
