@@ -466,7 +466,7 @@ class Analytics
         $d1 = new Google_Service_AnalyticsReporting_Dimension();
         $d1->setName("ga:pagePath");
         $d2 = new Google_Service_AnalyticsReporting_Dimension();
-        $d2->setName('ga:day');
+        $d2->setName('ga:date');
 
         $filter = new \Google_Service_AnalyticsReporting_DimensionFilter();
         $filter->setDimensionName('ga:pagePath');
@@ -477,7 +477,7 @@ class Analytics
         $clause->setFilters([$filter]);
         $clause->setOperator('OR');
 
-        $actual = $this->makeRequest([$metric], [$d2, $d1], [$clause], [$dateRange], $site_id, "formatDataChart", 100);
+        $actual = $this->makeRequest([$metric], [ $d2, $d1], [$clause], [$dateRange], $site_id, "formatDataPageDetails", 100);
 
         return isset($actual[$site_id]) ? $actual[$site_id]: [];
     }
@@ -534,6 +534,38 @@ class Analytics
                 array_push($data["values"], $value);
                 array_push($data["percents"], $prct);
                 array_push($data["labels"], ucfirst($row->getDimensions()[0]));
+            }
+        }
+
+        return $data;
+    }
+
+    private function formatDataPageDetails(Google_Response $response)
+    {
+        $data = [
+            "labels"   => [],
+            "values"   => [],
+            "total"    => 0,
+            'percents' => [],
+            'diff'     => []
+        ];
+
+        /** @var Google_Report $report */
+        foreach ($response->getReports() as $report) {
+            /** @var Google_Service_AnalyticsReporting_ReportRow $row */
+            $data["total"] = $report->getData()->getTotals()[0]->getValues()[0];
+            foreach ($report->getData()->getRows() as $row) {
+                $value = $row->getMetrics()[0]->getValues()[0];
+                $prct  = round(intval($value) / intval($data['total']), 4) * 100;
+
+                array_push($data["values"], $value);
+                array_push($data["percents"], $prct);
+                $label = (ucfirst($row->getDimensions()[0]));
+                $label =
+                    substr($label,6) . '/' .
+                    substr($label,4,2)
+                ;
+                array_push($data["labels"], $label);
             }
         }
 
