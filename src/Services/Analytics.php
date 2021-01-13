@@ -453,6 +453,35 @@ class Analytics
         return isset($actual[$site_id]) && isset($actual[$site_id]['total']) ? $actual[$site_id]['total'] : 0;
     }
 
+    public function getPageDetails($site_id, $path, $start = '1 month ago')
+    {
+        $dateRange = new Google_Service_AnalyticsReporting_DateRange();
+        $dateRange->setStartDate(date('Y-m-d', strtotime($start)));
+        $dateRange->setEndDate(date('Y-m-d', strtotime('yesterday')));
+
+        $metric = new Google_Service_AnalyticsReporting_Metric();
+        $metric->setExpression("ga:uniquePageviews");
+        $metric->setAlias(ucfirst('uniquePageviews'));
+
+        $d1 = new Google_Service_AnalyticsReporting_Dimension();
+        $d1->setName("ga:pagePath");
+        $d2 = new Google_Service_AnalyticsReporting_Dimension();
+        $d2->setName('ga:day');
+
+        $filter = new \Google_Service_AnalyticsReporting_DimensionFilter();
+        $filter->setDimensionName('ga:pagePath');
+        $filter->setOperator('EXACT');
+        $filter->setExpressions([$path]);
+
+        $clause = new \Google_Service_AnalyticsReporting_DimensionFilterClause();
+        $clause->setFilters([$filter]);
+        $clause->setOperator('OR');
+
+        $actual = $this->makeRequest([$metric], [$d2, $d1], [$clause], [$dateRange], $site_id, "formatDataChart", 100);
+
+        return isset($actual[$site_id]) ? $actual[$site_id]: [];
+    }
+
     private function makeRequest(array $metrics, array $dimensions, array $dimensions_clause, array $dates, $site_id, $method = "formatDataChart", $max = null, $order = false)
     {
         // Create the ReportRequest object.

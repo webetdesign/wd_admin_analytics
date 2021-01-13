@@ -48,9 +48,14 @@ class DataController extends AbstractController
     public function page(Request $request){
         $path = $request->request->get('path', null);
         $start = $request->request->get('start', null);
+        $details = $request->request->get('details', false);
 
         try{
-            $views = $start ? $this->analytics->getPage($this->base_view_id, $path, $start) : $this->analytics->getPage($this->base_view_id, $path);
+            if ($details){
+                $views = $start ? $this->analytics->getPageDetails($this->base_view_id, $path, $start) : $this->analytics->getPageDetails($this->base_view_id, $path);
+            }else{
+                $views = $start ? $this->analytics->getPage($this->base_view_id, $path, $start) : $this->analytics->getPage($this->base_view_id, $path);
+            }
         }catch (\Exception $e){
             $views = 0;
         }
@@ -59,6 +64,5 @@ class DataController extends AbstractController
             'views' => $views
         ]);
     }
-
 
 }
