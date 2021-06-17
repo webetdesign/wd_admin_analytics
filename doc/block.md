@@ -1,5 +1,5 @@
-## Data :            
-You can make different analytics blocks. See the list in the Block crud
+## Données :     
+Pour utiliser les blocs sur la dashboard, il faut ajouter ces deux blocs sans toucher à la configuration       
     
 ```yaml   
 #sonata_admin.yaml
@@ -19,14 +19,14 @@ You can make different analytics blocks. See the list in the Block crud
                type:     cms.admin.analytics.data
     
 ```   
-### Configuration of a block
+### Configuration des blocs
  
-To display a analytics block go in the crud and add it.
+Pour afficher un bloc, il faut aller dans le crud 'Blocs analytics' et l'ajouter
 
-### General Parameters
+### Paramètres généraux
 
 To configure colors go in the crud and add it.
 
-   - 'Couleurs' are used for Doughnut Chart you can add as much as you want
-   - 'Couleurs pour les comparaisons' are used for comparaison Chart like 'Utlisateurs cette semaine / semaine dernière'. You have to add exactly two.
-   - 'Couleur de dégradé' are use for Chart like 'Utilisateurs par heure'
+   - 'Couleurs' est utilisé pour rendre les camemberts, les couleurs seront utilisées dans l'ordre.
+   - 'Couleurs pour les comparaisons' est utilisé pour les diagrammes de comparaisons comme 'Utilisateurs cette semaine / semaine dernière'. Il faut ajouter 2 couleurs.
+   - 'Couleur de dégradé' est la couleur utilisée pour les dégradés dans les diagrammes comme 'Utilisateurs par heure'
