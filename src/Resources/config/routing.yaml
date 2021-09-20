@@ -1,14 +1,14 @@
 wd_admin_analytics_basic_list:
-  path: /api/basic
+  path: /analytics/api/basic
   # the controller value has the format 'controller_class::method_name'
   controller: WebEtDesign\AnalyticsBundle\Controller\DataController::basic
 
 wd_admin_analytics_users_list:
-  path: /api/users
+  path: /analytics/api/users
   # the controller value has the format 'controller_class::method_name'
   controller: WebEtDesign\AnalyticsBundle\Controller\DataController::users
 
 wd_admin_analytics_user_page:
-  path: /api/analytics/page
+  path: /analytics/api/analytics/page
   # the controller value has the format 'controller_class::method_name'
   controller: WebEtDesign\AnalyticsBundle\Controller\DataController::page
