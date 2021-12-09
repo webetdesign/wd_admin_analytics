@@ -482,7 +482,7 @@ class Analytics
         return isset($actual[$site_id]) ? $actual[$site_id]: [];
     }
 
-    private function makeRequest(array $metrics, array $dimensions, array $dimensions_clause, array $dates, $site_id, $method = "formatDataChart", $max = null, $order = false)
+    public function makeRequest(array $metrics, array $dimensions, array $dimensions_clause, array $dates, $site_id, $method = "formatDataChart", $max = null, $order = false)
     {
         // Create the ReportRequest object.
         $request = new Google_Service_AnalyticsReporting_ReportRequest();
