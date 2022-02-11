@@ -15,6 +15,7 @@ class BlockTypeEnum
     public const USERS = 'users';
     public const USER_WEEK = 'userWeek';
     public const USER_YEAR = 'userYear';
+    public const NEWSLETTER = 'newsletter';
 
     public static $choices = [
         self::BROWSERS => 'Navigateurs',
@@ -24,12 +25,20 @@ class BlockTypeEnum
         self::SOURCES => 'Sources de traffic',
         self::USERS => 'Utilisateurs par heure',
         self::USER_WEEK => 'Utilisateurs sur la semaine',
-        self::USER_YEAR => 'Utilisateurs sur l\'année'
+        self::USER_YEAR => 'Utilisateurs sur l\'année',
+        self::NEWSLETTER => 'Newsletter'
     ];
 
-    public static function getChoicesList(array $exists = [], Block $subject = null)
+    public static function getChoicesList(array $exists = [], Block $subject = null, bool $enableLog = false)
     {
-        $choices = array_flip(self::$choices);
+        $choices = self::$choices;
+
+        if (!class_exists("WebEtDesign\NewsletterBundle\Entity\NewsletterLog") || !$enableLog){
+            unset($choices[self::NEWSLETTER]);
+        }
+
+        $choices = array_flip($choices);
+
 
         foreach ($exists as $exist) {
             if (!$exist instanceof Block || $subject->getCode() == $exist->getCode()) continue;

@@ -1,0 +1,16 @@
+<div class="Chartjs p-4 shadow bg-block-analytics box box-primary" >
+    <div class="box-header box-header-analytics">
+        {% if icon is defined %}
+            <i class="{{ icon }}"></i>
+        {% endif %}
+        <h3 class="box-title" style="margin-bottom: 20px">Newsletter <span id="analytics_newsletter-title"></span></h3>
+
+        {% include '@WDAdminAnalytics/select_newsletter.html.twig' with {'default' : start | default(''), 'name' : 'newsletter'} %}
+
+    </div>
+    <div class="box-body">
+        <figure class="Chartjs-figure" id="newsletter-container"></figure>
+        <div class="doughnut-legend" id="newsletter-legend"></div>
+
+    </div>
+</div>

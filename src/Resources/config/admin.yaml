@@ -1,7 +1,7 @@
 services:
   cms.admin.analytics.block:
     class: '%wd_admin_analytics.admin.block%'
-    arguments: [~, '%wd_admin_analytics.entity.block%', ~, '@doctrine.orm.default_entity_manager']
+    arguments: [~, '%wd_admin_analytics.entity.block%', ~, '@doctrine.orm.default_entity_manager', '@service_container' ]
     tags:
       - { name: sonata.admin, manager_type: orm, group: Analytics, label: 'Blocks analytics'}
     public: true

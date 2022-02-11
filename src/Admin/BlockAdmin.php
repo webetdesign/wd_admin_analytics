@@ -13,6 +13,7 @@ use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Route\RouteCollection;
 use Sonata\AdminBundle\Show\ShowMapper;
 use Sonata\MediaBundle\Form\Type\MediaType;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -28,10 +29,14 @@ final class BlockAdmin extends AbstractAdmin
     /** @var EntityManagerInterface $em */
     private $em;
 
-    public function __construct($code, $class, $baseControllerName = null, EntityManagerInterface $em)
+    /** @var ContainerInterface $container */
+    private $container;
+
+    public function __construct($code, $class, $baseControllerName = null, EntityManagerInterface $em, ContainerInterface $container)
     {
         parent::__construct($code, $class, $baseControllerName);
         $this->em = $em;
+        $this->container = $container;
     }
 
     protected $translationDomain = 'admin';
@@ -62,7 +67,7 @@ final class BlockAdmin extends AbstractAdmin
         $formMapper
             ->add('code', ChoiceType::class, [
                 'label' => 'Type',
-                'choices' => BlockTypeEnum::getChoicesList($this->em->getRepository(Block::class)->findAll(), $this->getSubject()),
+                'choices' => BlockTypeEnum::getChoicesList($this->em->getRepository(Block::class)->findAll(), $this->getSubject(), $this->container->hasParameter('wd_newsletter.enable_log') && $this->container->getParameter('wd_newsletter.enable_log')),
                 'placeholder' => 'Choisir le type de block'
             ])
             ->add('start', ChoiceType::class, [

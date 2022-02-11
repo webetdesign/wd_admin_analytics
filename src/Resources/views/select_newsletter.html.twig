@@ -1,0 +1,7 @@
+{% set newsletters = analytics_available_newsletters()%}
+
+<select class="{{ class | default('select_news')}}" id="select_newsletter" data-name="newsletter" data-type="{{ type | default('doughnut') }}" data-label="{{ label | default('') }}">
+    {% for news in newsletters %}
+        <option value="{{news.id}}" {% if default is defined and default == news.id %} selected {% endif %}>{{news.title}}</option>
+    {% endfor %}
+</select>

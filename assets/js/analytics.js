@@ -1,28 +1,29 @@
 import Chart from "chart.js"
+
 // import './gapi.js';
 
-function loadGraph(name, reload = false, type = 'doughnut', label = null){
-    if (reload){
+function loadGraph(name, reload = false, type = 'doughnut', label = null) {
+    if (reload) {
         $('#' + name + '-container')[0].innerHTML = "Chargement ...";
         $.post('/analytics/api/basic',
             {
-                'start': loadStart(name),
+                'start': name == 'newsletter' ? loadNewsletter() : loadStart(name),
                 'method': name,
                 'site_id': loadSiteId()
-            }).done(function(data) {
+            }).done(function (data) {
             document.getElementById("data-" + name).dataset.values = JSON.stringify(data[loadSiteId()]);
             var container = document.getElementById("data-" + name).dataset.values;
-            if (type == 'doughnut'){
+            if (type == 'doughnut') {
                 renderDoughnut(JSON.parse(container), getColors(), name);
-            }else if(type == 'bar'){
+            } else if (type == 'bar') {
                 renderBar(JSON.parse(container), getColors()[0], name, label);
             }
         })
-    }else{
+    } else {
         var container = document.getElementById("data-" + name).dataset.values;
-        if (type == 'doughnut'){
+        if (type == 'doughnut') {
             renderDoughnut(JSON.parse(container), getColors(), name);
-        }else if(type == 'bar'){
+        } else if (type == 'bar') {
             renderBar(JSON.parse(container), getColors()[0], name, label);
         }
     }
@@ -31,73 +32,77 @@ function loadGraph(name, reload = false, type = 'doughnut', label = null){
 
 function getColors() {
     var colors = null;
-    if ( document.getElementById("colors")){
+    if (document.getElementById("colors")) {
         colors = document.getElementById("colors").dataset.colors;
         colors = JSON.parse(colors);
     }
     return colors;
 }
 
-function loadSiteId(){
-    if (document.getElementById('select-website')){
+function loadSiteId() {
+    if (document.getElementById('select-website')) {
         return document.getElementById('select-website').selectedOptions[0].value;
     }
 
     return null;
 }
 
-function loadStart(name){
+function loadStart(name) {
     return $("#select_start_" + name).length > 0 ? $("#select_start_" + name)[0].selectedOptions[0].value : '7 days ago';
 }
 
-function loadMap(reload){
+function loadNewsletter() {
+    return $("#select_newsletter").length > 0 ? $("#select_newsletter")[0].selectedOptions[0].value : null;
+}
+
+function loadMap(reload) {
     var countries = document.getElementById("data-countries").dataset.values;
     var map = document.getElementById("map_key").dataset.mapkey;
     var map_color = document.getElementById("map_color").dataset.mapcolor;
     var name = map ? 'countriesMap' : 'countriesChart'
 
-    if (reload){
+    if (reload) {
         $('#' + name + '-container')[0].innerHTML = "Chargement ...";
         $.post('/analytics/api/basic',
             {
                 'start': loadStart('countries'),
                 'method': name,
                 'site_id': loadSiteId(),
-            }).done(function(data) {
+            }).done(function (data) {
 
             document.getElementById("data-countries").dataset.values = JSON.stringify(data[loadSiteId()]);
 
             var countries = document.getElementById("data-countries").dataset.values;
 
-            renderCountries(JSON.parse(countries), map_color , map);
+            renderCountries(JSON.parse(countries), map_color, map);
         })
-    }else{
+    } else {
         var countries = document.getElementById("data-countries").dataset.values;
-        renderCountries(JSON.parse(countries), map_color    , map);
+        renderCountries(JSON.parse(countries), map_color, map);
     }
 
 }
 
-function loadUserWeek(reload){
+function loadUserWeek(reload) {
     var week_colors = {
-        0 : null,
-        1 : null
+        0: null,
+        1: null
     };
 
-    if ( document.getElementById("week_colors") != null){
+    if (document.getElementById("week_colors") != null) {
         week_colors = document.getElementById("week_colors").dataset.weekcolors;
         week_colors = JSON.parse(week_colors);
     }
 
     var name = 'userWeek';
 
-    if (reload){
+    if (reload) {
         $('#' + name + '-container')[0].innerHTML = "Chargement ...";
         $.post('/analytics/api/users',
             {
                 'method': name,
                 'site_id': loadSiteId()
-            }).done(function(data) {
+            }).done(function (data) {
 
             document.getElementById("data-" + name).dataset.values = JSON.stringify(data[loadSiteId()]);
 
@@ -105,7 +110,7 @@ function loadUserWeek(reload){
 
             renderWeekOverWeekChart(JSON.parse(weeks), week_colors);
         })
-    }else{
+    } else {
         var weeks = document.getElementById("data-userWeek").dataset.values;
 
         renderWeekOverWeekChart(JSON.parse(weeks), week_colors);
@@ -113,26 +118,26 @@ function loadUserWeek(reload){
 
 }
 
-function loadUserYear(reload){
+function loadUserYear(reload) {
     var year_colors = {
-        0 : null,
-        1 : null
+        0: null,
+        1: null
     };
 
-    if ( document.getElementById("year_colors") != null){
+    if (document.getElementById("year_colors") != null) {
         year_colors = document.getElementById("year_colors").dataset.yearcolors;
         year_colors = JSON.parse(year_colors);
     }
 
     var name = 'userYear';
 
-    if (reload){
+    if (reload) {
         $('#' + name + '-container')[0].innerHTML = "Chargement ...";
         $.post('/analytics/api/users',
             {
                 'method': name,
                 'site_id': loadSiteId()
-            }).done(function(data) {
+            }).done(function (data) {
 
             document.getElementById("data-" + name).dataset.values = JSON.stringify(data[loadSiteId()]);
 
@@ -140,7 +145,7 @@ function loadUserYear(reload){
 
             renderYearOverYearChart(JSON.parse(years), year_colors);
         })
-    }else{
+    } else {
         var years = document.getElementById("data-userYear").dataset.values;
 
         renderYearOverYearChart(JSON.parse(years), year_colors);
@@ -148,24 +153,24 @@ function loadUserYear(reload){
 
 }
 
-function loadPages(reload = false){
+function loadPages(reload = false) {
     var name = 'pages';
 
-    if (reload){
+    if (reload) {
         $('#' + name + '-container')[0].innerHTML = "Chargement ...";
         $.post('/analytics/api/basic',
             {
                 'start': loadStart(name),
                 'method': name,
                 'site_id': loadSiteId()
-            }).done(function(data) {
+            }).done(function (data) {
 
             document.getElementById("data-" + name).dataset.values = JSON.stringify(data[loadSiteId()]);
             var container = document.getElementById("data-" + name).dataset.values;
 
             renderPages(JSON.parse(container));
         })
-    }else{
+    } else {
         var container = document.getElementById("data-" + name).dataset.values;
 
         renderPages(JSON.parse(container));
@@ -173,30 +178,30 @@ function loadPages(reload = false){
 
 }
 
-function loadUsers(reload = false){
+function loadUsers(reload = false) {
     var name = 'users';
     var users_color = document.getElementById("users_color").dataset.userscolor;
 
-    if (reload){
+    if (reload) {
         $('#' + name + '-container')[0].innerHTML = "Chargement ...";
         $.post('/analytics/api/users',
             {
                 'method': name,
                 'site_id': loadSiteId()
-            }).done(function(data) {
+            }).done(function (data) {
 
             document.getElementById("data-" + name).dataset.values = JSON.stringify(data[loadSiteId()]);
             var users = document.getElementById("data-users").dataset.values;
             renderUsers(JSON.parse(users), users_color, "users");
         })
-    }else{
-        var users = document.getElementById("data-users" ).dataset.values;
+    } else {
+        var users = document.getElementById("data-users").dataset.values;
         renderUsers(JSON.parse(users), users_color, "users");
     }
 
 }
 
-function loadData(reload = false){
+function loadData(reload = false) {
 
     var site_id = loadSiteId();
 
@@ -204,45 +209,52 @@ function loadData(reload = false){
 
     var colors = getColors();
 
-    if (document.getElementById("browsers-container") != null){
+    if (document.getElementById("browsers-container") != null) {
         loadGraph('browsers', reload)
     }
 
-    if (document.getElementById('userWeek-container') != null){
+    if (document.getElementById('userWeek-container') != null) {
         loadUserWeek(reload)
     }
 
-    if (document.getElementById('userYear-container') != null){
+    if (document.getElementById('userYear-container') != null) {
         loadUserYear(reload)
     }
 
-    if (document.getElementById("sources-container") != null){
+    if (document.getElementById("sources-container") != null) {
         loadGraph('sources', reload, document.getElementById("select_start_sources").dataset.type, document.getElementById("select_start_sources").dataset.label)
     }
 
-    if (document.getElementById("devices-container") != null){
+    if (document.getElementById("devices-container") != null) {
         loadGraph('devices', reload)
     }
 
-    if (document.getElementById("pages-container") != null){
+    if (document.getElementById("pages-container") != null) {
         loadPages(reload);
     }
 
-    if (document.getElementById("countriesMap-container") != null || document.getElementById("countriesChart-container") != null){
+    if (document.getElementById("countriesMap-container") != null || document.getElementById("countriesChart-container") != null) {
         loadMap(reload)
     }
 
-    if (document.getElementById("users-container") != null){
+    if (document.getElementById("users-container") != null) {
         loadUsers(reload);
+    }
+
+    if (document.getElementById("newsletter-container") != null) {
+        loadGraph('newsletter', reload)
     }
 }
 
 function renderDoughnut(response, colors, name) {
 
-    if (response.labels.length === 0){
+    if (response.labels.length === 0) {
+        document.querySelector("#analytics_newsletter-title").innerHTML = '';
+        document.querySelector('#' + name + '-legend').innerHTML = '';
         $('#' + name + '-container')[0].innerHTML = "<h4> Vous n'avez pas de données pour ce type d'analytics </h4>";
         return;
-    };
+    }
+    ;
 
     var data = [];
     var colors_chart = [];
@@ -255,17 +267,16 @@ function renderDoughnut(response, colors, name) {
         colors_chart.push(colors[i]);
     }
 
-    data['datasets'] =  [];
+    data['datasets'] = [];
     data['datasets'].push({
         "data": values,
-        "backgroundColor" : colors_chart
+        "backgroundColor": colors_chart
     });
 
-    data['labels'] =  labels;
-    data['diff'] =  response.diff;
-    data['percents'] =  response.percents;
-    data['total'] =  response.total[0];
-
+    data['labels'] = labels;
+    data['diff'] = response.diff;
+    data['percents'] = response.percents;
+    data['total'] = response.total;
 
     var chart = new Chart(makeCanvas(name + '-container'), {
         type: 'doughnut',
@@ -275,7 +286,7 @@ function renderDoughnut(response, colors, name) {
             legend: false,
             tooltips: {
                 callbacks: {
-                    label: function(tooltipItem, data) {
+                    label: function (tooltipItem, data) {
                         var label = data.labels[tooltipItem.index][0];
 
                         if (label) {
@@ -286,51 +297,53 @@ function renderDoughnut(response, colors, name) {
                     }
                 }
             },
-            legendCallback: function(chart) {
+            legendCallback: function (chart) {
                 var legendHtml = [];
                 var item = chart.data.datasets[0];
                 var width = (100 / item.data.length) + "%";
                 var td = null;
                 legendHtml.push('<table style="margin-bottom: 5px; margin-top: 30px"><tr>')
 
-                if (chart.data.labels[0][1] !== null){
-                    for (var i=0; i < item.data.length; i++) {
-                        legendHtml.push('<td class="chart-legend" style="color:' + item.backgroundColor[i] +'"><i class="' + chart.data.labels[i][1] +'"></i></td>');
+                if (chart.data.labels[0][1] !== null) {
+                    for (var i = 0; i < item.data.length; i++) {
+                        legendHtml.push('<td class="chart-legend" style="color:' + item.backgroundColor[i] + '"><i class="' + chart.data.labels[i][1] + '"></i></td>');
                     }
                     legendHtml.push('</tr>')
 
                     legendHtml.push('<tr>')
                 }
 
-                for (var i=0; i < item.data.length; i++) {
+                for (var i = 0; i < item.data.length; i++) {
                     td = '<td class="chart-legend-label-text"';
                     td += 'style="width: ' + width;
-                    if (chart.data.labels[i][1] == null){
+                    if (chart.data.labels[i][1] == null) {
                         td += ' ; color:' + item.backgroundColor[i] + '">';
-                    }else{
+                    } else {
                         td += '">';
                     }
 
-                    td += chart.data.labels[i][0] +'</td>';
+                    td += chart.data.labels[i][0] + '</td>';
                     legendHtml.push(td)
 
                 }
                 legendHtml.push('</tr>')
 
                 legendHtml.push('<tr>')
-                for (var i=0; i < item.data.length; i++) {
+                for (var i = 0; i < item.data.length; i++) {
                     var prct = parseFloat(chart.data.percents[i]).toFixed(2)
-                    legendHtml.push('<td class="chart-legend-label-text" style="width: ' + width +' ">' + prct +' %</td>');
+                    legendHtml.push('<td class="chart-legend-label-text" style="width: ' + width + ' ">' + prct + ' %</td>');
                 }
                 legendHtml.push('</tr>')
 
-                legendHtml.push('<tr>')
-                for (var i=0; i < item.data.length; i++) {
-                    var prct = parseFloat(chart.data.diff[i]).toFixed(2)
-                    var css = prct >= 0 ? 'text-success' : 'text-danger';
-                    legendHtml.push('<td class="chart-legend-label-diff ' + css + ' " style="width: ' + width +' ">' + prct +' %</td>');
+                if (chart.data.diff !== undefined) {
+                    legendHtml.push('<tr>')
+                    for (var i = 0; i < item.data.length; i++) {
+                        var prct = parseFloat(chart.data.diff[i]).toFixed(2)
+                        var css = prct >= 0 ? 'text-success' : 'text-danger';
+                        legendHtml.push('<td class="chart-legend-label-diff ' + css + ' " style="width: ' + width + ' ">' + prct + ' %</td>');
+                    }
+                    legendHtml.push('</tr>')
                 }
-                legendHtml.push('</tr>')
 
                 legendHtml.push('</table>')
                 return legendHtml.join("");
@@ -339,36 +352,40 @@ function renderDoughnut(response, colors, name) {
     });
 
     $('#' + name + '-legend').html(chart.generateLegend());
+
+    if (name === "newsletter"){
+        document.querySelector("#analytics_newsletter-title").innerHTML = ' - ' + document.querySelector("#select_newsletter").selectedOptions[0].innerHTML + ' (' + data['total'] + ' emails)'
+    }
 }
 
-function renderBar(data, color, name, label){
+function renderBar(data, color, name, label) {
     let labels = [];
 
     data.labels.forEach((item, index) => {
-        if (Array.isArray(item)){
+        if (Array.isArray(item)) {
             labels.push(item[0])
-        }else{
+        } else {
             labels.push(item)
         }
     })
 
     var values = {
-        labels : labels,
-        datasets : [
+        labels: labels,
+        datasets: [
             {
                 label: label,
-                backgroundColor : color,
-                data : data.values
+                backgroundColor: color,
+                data: data.values
             }
         ]
     };
 
-    var  options = {
+    var options = {
         tooltips: {
             mode: 'index',
             intersect: false,
             callbacks: {
-                labelColor: function(tooltipItem, chart) {
+                labelColor: function (tooltipItem, chart) {
                     return {
                         backgroundColor: colors[tooltipItem.datasetIndex]
                     }
@@ -386,36 +403,36 @@ function renderBar(data, color, name, label){
 function renderWeekOverWeekChart(data, colors) {
 
     var values = {
-        labels : data.labels,
-        datasets : [
+        labels: data.labels,
+        datasets: [
             {
                 label: 'Semaine dernière',
-                borderColor : colors[0],
-                pointColor : colors[0],
+                borderColor: colors[0],
+                pointColor: colors[0],
                 backgroundColor: 'rgb(255,255,255,0)',
                 borderDash: [10, 8],
-                pointStrokeColor : '#fff',
-                data :  data.values.last_week,
+                pointStrokeColor: '#fff',
+                data: data.values.last_week,
                 fill: true
             },
             {
                 label: 'Cette semaine',
-                borderColor : colors[1],
-                pointColor : colors[1],
+                borderColor: colors[1],
+                pointColor: colors[1],
                 backgroundColor: 'rgb(255,255,255,0)',
-                pointStrokeColor : '#fff',
-                data : data.values.this_week,
+                pointStrokeColor: '#fff',
+                data: data.values.this_week,
                 fill: true
             },
         ]
     };
 
-    var  options = {
+    var options = {
         tooltips: {
             mode: 'index',
             intersect: false,
             callbacks: {
-                labelColor: function(tooltipItem, chart) {
+                labelColor: function (tooltipItem, chart) {
                     return {
                         backgroundColor: colors[tooltipItem.datasetIndex]
                     }
@@ -432,27 +449,27 @@ function renderWeekOverWeekChart(data, colors) {
 
 function renderYearOverYearChart(data, colors) {
     var values = {
-        labels : data.labels,
-        datasets : [
+        labels: data.labels,
+        datasets: [
             {
                 label: 'Année dernière',
-                backgroundColor : colors[0],
-                data : data.values.last_year
+                backgroundColor: colors[0],
+                data: data.values.last_year
             },
             {
                 label: 'Cette année',
-                backgroundColor : colors[1],
-                data : data.values.this_year
+                backgroundColor: colors[1],
+                data: data.values.this_year
             }
         ]
     };
 
-    var  options = {
+    var options = {
         tooltips: {
             mode: 'index',
             intersect: false,
             callbacks: {
-                labelColor: function(tooltipItem, chart) {
+                labelColor: function (tooltipItem, chart) {
                     return {
                         backgroundColor: colors[tooltipItem.datasetIndex]
                     }
@@ -467,23 +484,23 @@ function renderYearOverYearChart(data, colors) {
     });
 }
 
-function renderCountries(data, color, mapKey){
-    if (mapKey){
-        if (document.getElementById("countriesChart-container") != null){
+function renderCountries(data, color, mapKey) {
+    if (mapKey) {
+        if (document.getElementById("countriesChart-container") != null) {
             document.getElementById("countriesChart-container").remove()
         }
         google.charts.load('current', {
-            'packages':['geochart'],
+            'packages': ['geochart'],
             'mapsApiKey': mapKey,
         });
 
-        setTimeout(function() {
+        setTimeout(function () {
             google.charts.setOnLoadCallback(drawMap(data, color));
         }, 2000)
 
         $("#countriesMap-container").show()
-    }else{
-        if (document.getElementById("countriesMap-container") != null){
+    } else {
+        if (document.getElementById("countriesMap-container") != null) {
             document.getElementById("countriesMap-container").remove()
         }
 
@@ -492,28 +509,28 @@ function renderCountries(data, color, mapKey){
 
 }
 
-function renderUsers(data, color){
+function renderUsers(data, color) {
     var visits = data["values"];
     var max = data["max"];
     $("#users-container")[0].innerHTML = "";
 
-    $.each(visits, function(i, row) {
-        var id = "row-" + i ;
-        $("#users-container").append('<div class="row " id="'+id+'">\n' +
+    $.each(visits, function (i, row) {
+        var id = "row-" + i;
+        $("#users-container").append('<div class="row " id="' + id + '">\n' +
             '\n' +
             '</div>'
         )
-        $.each(row, function(j, value) {
+        $.each(row, function (j, value) {
             var colorDiv = getColorUser(max, value, color);
-            $("#"+id).append('<div ' +
+            $("#" + id).append('<div ' +
                 'class="col-xs-1 m-1 " ' +
-                'style="background-color: '+ colorDiv +'; height: 12px; border: 2px solid white" ' +
+                'style="background-color: ' + colorDiv + '; height: 12px; border: 2px solid white" ' +
                 'rel=\'tooltip\' data-original-title=\'' +
                 '<span style=" color: #A6ACAF;">' + getDay(j) + ' ' + i + 'h' + '</span>' +
                 '<br>' +
-                '<span style="font-size: 1.6rem; color: white;">'+ value +'</span>' +
+                '<span style="font-size: 1.6rem; color: white;">' + value + '</span>' +
                 '<br>' +
-                '<span style=" color: #A6ACAF;">' + (value < 2 ? 'Utilisateur' : 'Utilisateurs') +'</span>' +
+                '<span style=" color: #A6ACAF;">' + (value < 2 ? 'Utilisateur' : 'Utilisateurs') + '</span>' +
                 '\'' +
                 '>\n</div>'
             );
@@ -526,13 +543,13 @@ function renderUsers(data, color){
         '</div>'
     )
     for (var i = 0; i < 7; i++) {
-        $("#row-date").append('<div class="col-xs-1 m-1 text-center" style=" height: 10px; border: 1px solid inherit; left: -5px;  font-size: 1.2rem; color: #A6ACAF;" >'+ getDay(i)  + '</div>');
+        $("#row-date").append('<div class="col-xs-1 m-1 text-center" style=" height: 10px; border: 1px solid inherit; left: -5px;  font-size: 1.2rem; color: #A6ACAF;" >' + getDay(i) + '</div>');
     }
 
-    $("[rel=tooltip]").tooltip({html:true});
+    $("[rel=tooltip]").tooltip({html: true});
 }
 
-function renderPages(data){
+function renderPages(data) {
     var container = $("#pages-container");
 
     var html = '<table class="pages-table">';
@@ -556,7 +573,7 @@ function renderPages(data){
 
 }
 
-function getColorUser(max, value, color){
+function getColorUser(max, value, color) {
     if (value === 0) return "#dfdfdf";
     var prct = value / max;
     return color.substring(0, 17) + ", " + (prct) + ")";
@@ -591,7 +608,7 @@ function getDay(day) {
     }
 }
 
-function drawMap(values, color){
+function drawMap(values, color) {
     var data = google.visualization.arrayToDataTable(values);
 
     var options = {
@@ -617,4 +634,4 @@ function makeCanvas(id) {
     return ctx;
 }
 
-export {loadGraph, loadData, loadPages, loadUsers, loadMap}
+export {loadNewsletter, loadGraph, loadData, loadPages, loadUsers, loadMap}

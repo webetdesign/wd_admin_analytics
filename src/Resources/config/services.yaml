@@ -33,6 +33,7 @@ services:
   WebEtDesign\AnalyticsBundle\Services\Analytics:
     arguments:
       - '@analytics_api.api'
+      - '@doctrine.orm.default_entity_manager'
       - '%wd_admin_analytics.view_ids%'
 
   analytics_api.service:
@@ -50,6 +51,8 @@ services:
     public: true
     arguments:
       - '@analytics_api.service'
+      - '@doctrine.orm.default_entity_manager'
+      - '@service_container'
     tags:
       - { name: twig.extension }
 

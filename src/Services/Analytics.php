@@ -4,6 +4,7 @@ namespace WebEtDesign\AnalyticsBundle\Services;
 
 use Cocur\Slugify\Slugify;
 use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
 use Google_Client;
 use Google_Service_AnalyticsReporting;
 use Google_Service_AnalyticsReporting_DateRange;
@@ -24,6 +25,11 @@ class Analytics
      * @var GoogleAnalyticsService
      */
     private $analyticsService;
+
+    /**
+     * @var EntityManagerInterface $em
+     */
+    private $em;
 
     /**
      * @var array
@@ -53,9 +59,10 @@ class Analytics
      * @param $ids
      * @param int $maxPage
      */
-    public function __construct(GoogleAnalyticsService $analyticsService, $ids, int $maxPage = 10)
+    public function __construct(GoogleAnalyticsService $analyticsService, EntityManagerInterface $em, $ids, int $maxPage = 10)
     {
         $this->analyticsService = $analyticsService;
+        $this->em = $em;
         $this->viewIds          = $ids;
         $this->client           = $analyticsService->getClient();
         $this->analyticsReport  = new Google_Service_AnalyticsReporting($this->client);
@@ -657,6 +664,18 @@ class Analytics
         $data["values"] = $visits;
 
         return $data;
+    }
+
+    /**
+     * @param string $site_id
+     * @param ?int $newsletterId
+     * @return array
+     */
+    public function getNewsletter($site_id, ?int $newsletterId = null)
+    {
+        return [
+            $site_id => $this->em->getRepository("WebEtDesign\NewsletterBundle\Entity\NewsletterLog")->getAnalytics($site_id, $newsletterId)
+        ];
     }
 
 }
