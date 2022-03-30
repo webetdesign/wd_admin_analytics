@@ -41,7 +41,9 @@ services:
     public: true
 
   WebEtDesign\AnalyticsBundle\Controller\DataController:
+    autowire: true
     arguments:
+      - '@cache.app'
       - '@analytics_api.service'
       - '%env(GOOGLE_ANALYTICS_VIEW_ID)%'
     tags: ['controller.service_arguments']

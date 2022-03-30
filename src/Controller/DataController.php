@@ -5,36 +5,55 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use WebEtDesign\AnalyticsBundle\Services\Analytics;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Component\Cache\CacheItem;
 
 class DataController extends AbstractController
 {
-    /**
-     * @var Analytics
-     */
-    private $analytics;
+    private Analytics $analytics;
+    private CacheInterface $cache;
 
     /**
      * DataController constructor.
      * @param Analytics $analytics
      * @param string $base_view_id
      */
-    public function __construct(Analytics $analytics, string $base_view_id)
+    public function __construct(CacheInterface $cache,Analytics $analytics, string $base_view_id)
     {
         $this->analytics = $analytics;
         $this->base_view_id = $base_view_id;
+        $this->cache = $cache;
     }
 
-    /**
-     * @param Request $request
-     */
     public function basic(Request $request){
         $method = 'get' . ucfirst($request->request->get('method', 'Devices'));
-        return new JsonResponse($this->analytics->$method(
-            $request->request->get('site_id'),
-            $request->request->get('start'))
-        );
-    }
+        $site_id = $request->request->get('site_id');
+        $start = $request->request->get('start');
 
+        $key = 'dashboard_' . strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '_', $start))) . '_' . $method . '_' . $site_id;
+
+        $cache_value = null;
+        $data = null;
+
+        try {
+            $cache_value = $this->cache->getItem($key);
+            if ($cache_value->isHit()) {
+                $data = $cache_value->get();
+            }
+        } catch (InvalidArgumentException $e) {
+        }
+
+        if (!$data){
+            $data = $this->analytics->$method($site_id, $start);
+            if ($cache_value instanceOf CacheItem){
+                $cache_value->expiresAfter(86400);
+                $cache_value->set($data);
+                $this->cache->save($cache_value);
+            }
+        }
+
+        return new JsonResponse($data);
+    }
     /**
      * @param Request $request
      */
