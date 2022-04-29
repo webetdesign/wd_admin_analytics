@@ -674,7 +674,7 @@ class Analytics
     public function getNewsletter($site_id, ?int $newsletterId = null)
     {
         return [
-            $site_id => $this->em->getRepository("WebEtDesign\NewsletterBundle\Entity\NewsletterLog")->getAnalytics($site_id, $newsletterId)
+            $site_id => $this->em->getRepository("WebEtDesign\NewsletterBundle\Entity\NewsletterLog")->getAnalyticsStats($site_id, $newsletterId)
         ];
     }
 
