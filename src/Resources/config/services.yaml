@@ -25,7 +25,7 @@ services:
 
   analytics_api.api:
     class:  WebEtDesign\AnalyticsBundle\Services\GoogleAnalyticsService
-    arguments: ["%google_analytics_api.google_analytics_json_key%"]
+    arguments: ["%wd_admin_analytics.google_analytics_json_key%"]
     public: true
 
   WebEtDesign\AnalyticsBundle\Services\Analytics:

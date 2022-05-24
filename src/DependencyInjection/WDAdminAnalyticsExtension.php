@@ -33,10 +33,11 @@ class WDAdminAnalyticsExtension extends Extension
         $container->setParameter('wd_admin_analytics.admin.block', BlockAdmin::class);
         $container->setParameter('wd_admin_analytics.admin.configuration', ConfigAdmin::class);
 
+        $container->setParameter('wd_admin_analytics.google_analytics_json_key', $config['parameters']['google_analytics_json_key']);
 
     }
 
-    public function getAlias()
+    public function getAlias(): string
     {
         return 'wd_admin_analytics';
     }

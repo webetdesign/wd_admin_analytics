@@ -28,7 +28,6 @@
 ```php
     #...
     WebEtDesign\AnalyticsBundle\WDAdminAnalyticsBundle::class => ['all' => true],
-    MediaFigaro\GoogleAnalyticsApi\GoogleAnalyticsApi::class => ['all' => true],
     #...
 ```
 3° Créer un fichier wd_admin_analytics.yaml : 
@@ -38,6 +37,7 @@
                      view_ids: [000000000]
                      view_names: ['name']
                      map_key: your-map-key
+                     google_analytics_json_key: "%kernel.project_dir%/%env(resolve:GOOGLE_ANALYTICS_JSON_KEY)%"
                      
         # 000000000 = profile id that you can find in the analytics URL, p000000000 :
         #https://analytics.google.com/analytics/web/?hl=en&pli=1#management/Settings/a222222222w1111111111p000000000/   
@@ -62,10 +62,6 @@ wd_admin_analytics.data_api:
    
    2 ° Sauvegarder ce fichier dans le dossier var du projet.
    
-   3° Renommer le fichier google_apiclient.yaml file en google-analytics-api et remplacer son contenu par : 
-```yaml
-    google_analytics_api:
-        google_analytics_json_key: "%kernel.project_dir%/%env(resolve:GOOGLE_ANALYTICS_JSON_KEY)%"
 ```            
    4° Créer une variable d'environnement avec le chemin depuis la racine du projet vers le fichier json :
 ```dotenv   
