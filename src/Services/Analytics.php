@@ -14,48 +14,25 @@ use Google_Service_AnalyticsReporting_GetReportsResponse as Google_Response;
 use Google_Service_AnalyticsReporting_Metric;
 use Google_Service_AnalyticsReporting_Report as Google_Report;
 use Google_Service_AnalyticsReporting_ReportRequest;
-use Google_Service_AnalyticsReporting_ReportRow;
-use WebEtDesign\AnalyticsBundle\Services\GoogleAnalyticsService;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Google_Service_AnalyticsReporting_OrderBy;
+use Google_Service_AnalyticsReporting_ReportRow;
+use JetBrains\PhpStorm\Pure;
 
 class Analytics
 {
-    /**
-     * @var GoogleAnalyticsService
-     */
-    private $analyticsService;
 
-    /**
-     * @var EntityManagerInterface $em
-     */
-    private $em;
-
-    /**
-     * @var array
-     */
-    private $viewIds;
-
-    /**
-     * @var Google_Service_AnalyticsReporting
-     */
-    private $analyticsReport;
-
-    /**
-     * @var Google_Client
-     */
-    private $client;
-    /**
-     * @var int
-     */
-    public $maxPage;
-
-    /** @var Slugify $slugify */
-    public $slugify;
+    private GoogleAnalyticsService $analyticsService;
+    private EntityManagerInterface $em;
+    private array $viewIds;
+    private Google_Service_AnalyticsReporting $analyticsReport;
+    private Google_Client $client;
+    public int $maxPage;
+    public Slugify $slugify;
 
     /**
      * Analytics constructor.
      * @param GoogleAnalyticsService $analyticsService
+     * @param EntityManagerInterface $em
      * @param $ids
      * @param int $maxPage
      */
@@ -70,17 +47,9 @@ class Analytics
         $this->slugify          = new Slugify();
     }
 
-    /**
-     * @param string $metric_name
-     * @param string $dimension_name
-     * @param string $start
-     * @param string $site_id
-     * @param string $end
-     * @return array
-     */
-    public function getBasicChart($metric_name, $dimension_name, $start, $site_id, $end = "yesterday", $max = null)
+    public function getBasicChart(string $metric_name, string $dimension_name, string $start, string $site_id, string $end = "yesterday", $max = null): array
     {
-        $max = $max ? $max : $this->maxPage;
+        $max = $max ?: $this->maxPage;
 
         $dateRange = new Google_Service_AnalyticsReporting_DateRange();
         $dateRange->setStartDate(date('Y-m-d', strtotime($start)));
@@ -118,13 +87,7 @@ class Analytics
         return $actual;
     }
 
-    /**
-     * Return Number or Users per Browser
-     * @param string $site_id
-     * @param string $start
-     * @return array
-     */
-    public function getBrowsers($site_id, $start = "30 days ago")
+    public function getBrowsers($site_id, $start = "30 days ago"): array
     {
         $data = $this->getBasicChart("users", "browser", $start, $site_id, 'yesterday', 5);
 
@@ -146,7 +109,7 @@ class Analytics
      *      [monday -> sunday] last week
      * @return array
      */
-    public function getUserWeek($site_id)
+    public function getUserWeek(string $site_id): array
     {
         $thisWeek = new Google_Service_AnalyticsReporting_DateRange();
         // week - 1
@@ -176,11 +139,12 @@ class Analytics
         $response_this_week = $this->getDiffForWeek($response_this_week);
         $response_last_week = $this->getDiffForWeek($response_last_week);
 
+        $data = [];
         foreach ($response_this_week as $key => $row) {
             $data[$key] = [
                 "labels" => $this->getLabelsWeek(),
                 "values" => [
-                    "this_week" => $response_this_week[$key],
+                    "this_week" => $row,
                     "last_week" => $response_last_week[$key]
                 ]
             ];
@@ -189,10 +153,7 @@ class Analytics
         return $data;
     }
 
-    /**
-     * @return array
-     */
-    private function getLabelsWeek()
+    private function getLabelsWeek(): array
     {
         $days   = ["Lun.", "Mar.", "Mer.", "Jeu.", "Ven.", "Sam.", "Dim."];
         $labels = [];
@@ -215,7 +176,7 @@ class Analytics
      * @param array $array
      * @return array
      */
-    private function getDiffForWeek($array)
+    private function getDiffForWeek(array $array): array
     {
         $previous = null;
         // append 0 in values array if days are missing because API not return days without session
@@ -246,7 +207,7 @@ class Analytics
      *      [january -> december] last year
      * @return array
      */
-    public function getUserYear($site_id)
+    public function getUserYear(string $site_id): array
     {
         $thisYear = new Google_Service_AnalyticsReporting_DateRange();
         // this monday
@@ -281,12 +242,12 @@ class Analytics
                 "labels" => ['Jan.', 'Fev.', 'Mar.', 'Avr.', 'Mai.', 'Jui.', 'Juil.', 'Aou.', 'Sep.', 'Oct.', 'Nov.', 'Dec.'],
                 "values" => [
                     "last_year" => $response_last_year[$key],
-                    "this_year" => $response_this_year[$key]
+                    "this_year" => $row
                 ]
             ];
         }
 
-        return $data;
+        return $data ?? [];
     }
 
     /**
@@ -294,7 +255,7 @@ class Analytics
      * @param array $array
      * @return array
      */
-    private function getDiffForYear($array)
+    private function getDiffForYear(array $array): array
     {
         $previous = "00";
 
@@ -321,7 +282,7 @@ class Analytics
      * @param string $start
      * @return array
      */
-    public function getSources($site_id, $start = "first day of january this year")
+    public function getSources(string $site_id, string $start = "first day of january this year"): array
     {
         $data = $this->getBasicChart("sessions", "source", $start, $site_id);
 
@@ -345,23 +306,17 @@ class Analytics
      * @param string $site_id
      * @return array
      */
-    public function getDevices($site_id, $start = "30 days ago")
+    public function getDevices(string $site_id, string $start = "30 days ago"): array
     {
         $data = $this->getBasicChart("sessions", "deviceCategory", $start, $site_id);
 
         foreach ($data as $row_key => $row) {
             foreach ($row["labels"] as $key => $label) {
-                switch (strtolower($label)) {
-                    case 'mobile':
-                        $row["labels"][$key] = ['Mobile', 'fa-4x fa fa-mobile'];
-                        break;
-                    case 'desktop':
-                        $row["labels"][$key] = ["Ordinateur", 'fa fa-desktop fa-4x'];
-                        break;
-                    case 'tablet':
-                        $row["labels"][$key] = ["Tablette", 'fa-lg fa fa-tablet fa-4x fa-rotate-90'];
-                        break;
-                }
+                $row["labels"][$key] = match (strtolower($label)) {
+                    'mobile' => ['Mobile', 'fa-4x fa fa-mobile'],
+                    'desktop' => ["Ordinateur", 'fa fa-desktop fa-4x'],
+                    'tablet' => ["Tablette", 'fa-lg fa fa-tablet fa-4x fa-rotate-90'],
+                };
                 $data[$row_key] = $row;
             }
         }
@@ -371,10 +326,12 @@ class Analytics
 
     /**
      * Return number of users per country for map
+     * @param $site_id
      * @param string $start
+     * @param int $max
      * @return array
      */
-    public function getCountriesMap($site_id, $start = "first day of january this year", $max = 30)
+    public function getCountriesMap($site_id, string $start = "first day of january this year", $max = 30): array
     {
         $response = $this->getBasicChart("users", "country", $start, $site_id, 'yesterday', $max);
         $data     = [];
@@ -396,10 +353,11 @@ class Analytics
 
     /**
      * Return number of users per country for chart
+     * @param string $site_id
      * @param string $start
      * @return array
      */
-    public function getCountriesChart($site_id, $start = "first day of january this year")
+    public function getCountriesChart(string $site_id, string $start = "first day of january this year"): array
     {
         return $this->getBasicChart("users", "country", $start, $site_id, 'yesterday', 10);
     }
@@ -407,9 +365,9 @@ class Analytics
     /**
      * @param string $site_id
      * @param string $start
-     * @return mixed
+     * @return array
      */
-    public function getUsers($site_id, $start = "30 days ago")
+    public function getUsers(string $site_id, string $start = "30 days ago"): mixed
     {
         $dateRange = new Google_Service_AnalyticsReporting_DateRange();
         $dateRange->setStartDate(date('Y-m-d', strtotime($start)));
@@ -428,9 +386,7 @@ class Analytics
         $d3 = new Google_Service_AnalyticsReporting_Dimension();
         $d3->setName('ga:day');
 
-        $data = $this->makeRequest([$metric], [$d1, $d2, $d3], [], [$dateRange], $site_id, "formatDataUsers");
-
-        return $data;
+        return $this->makeRequest([$metric], [$d1, $d2, $d3], [], [$dateRange], $site_id, "formatDataUsers");
     }
 
     public function getPage($site_id, $path, $start = '1 month ago')
@@ -486,10 +442,10 @@ class Analytics
 
         $actual = $this->makeRequest([$metric], [ $d2, $d1], [$clause], [$dateRange], $site_id, "formatDataPageDetails", 100);
 
-        return isset($actual[$site_id]) ? $actual[$site_id]: [];
+        return $actual[$site_id] ?? [];
     }
 
-    public function makeRequest(array $metrics, array $dimensions, array $dimensions_clause, array $dates, $site_id, $method = "formatDataChart", $max = null, $order = false)
+    public function makeRequest(array $metrics, array $dimensions, array $dimensions_clause, array $dates, $site_id, $method = "formatDataChart", $max = null, $order = false): array
     {
         // Create the ReportRequest object.
         $request = new Google_Service_AnalyticsReporting_ReportRequest();
@@ -520,7 +476,7 @@ class Analytics
         return $data;
     }
 
-    private function formatDataChart(Google_Response $response)
+    private function formatDataChart(Google_Response $response): array
     {
         $data = [
             "labels"   => [],
@@ -536,10 +492,10 @@ class Analytics
             $data["total"] = $report->getData()->getTotals()[0]->getValues()[0];
             foreach ($report->getData()->getRows() as $row) {
                 $value = $row->getMetrics()[0]->getValues()[0];
-                $prct  = round(intval($value) / intval($data['total']), 4) * 100;
+                $percent  = round(intval($value) / intval($data['total']), 4) * 100;
 
                 array_push($data["values"], $value);
-                array_push($data["percents"], $prct);
+                array_push($data["percents"], $percent);
                 array_push($data["labels"], ucfirst($row->getDimensions()[0]));
             }
         }
@@ -547,7 +503,7 @@ class Analytics
         return $data;
     }
 
-    private function formatDataPageDetails(Google_Response $response)
+    private function formatDataPageDetails(Google_Response $response): array
     {
         $data = [
             "labels"   => [],
@@ -584,7 +540,7 @@ class Analytics
      * @param string $site_id
      * @return array
      */
-    public function getPages($site_id, $start = "30 days ago")
+    public function getPages(string $site_id, string $start = "30 days ago"): array
     {
         $max = 10;
 
@@ -607,12 +563,10 @@ class Analytics
         $dimension = new Google_Service_AnalyticsReporting_Dimension();
         $dimension->setName("ga:pagePath");
 
-        $actual = $this->makeRequest([$metric, $metric_2, $metric_3], [$dimension], [], [$dateRange], $site_id, "formatPages", $max, true);
-
-        return $actual;
+        return $this->makeRequest([$metric, $metric_2, $metric_3], [$dimension], [], [$dateRange], $site_id, "formatPages", $max, true);
     }
 
-    private function formatPages(Google_Response $response)
+    private function fomatPages(Google_Response $response): array
     {
         $data = [
             "labels" => [],
@@ -635,7 +589,7 @@ class Analytics
         return $data;
     }
 
-    private function formatDataUsers(Google_Response $response)
+    #[Pure] private function formatDataUsers(Google_Response $response): array
     {
         $data = [
             "labels" => [],
@@ -671,7 +625,7 @@ class Analytics
      * @param ?int $newsletterId
      * @return array
      */
-    public function getNewsletter($site_id, ?int $newsletterId = null)
+    public function getNewsletter(string $site_id, ?int $newsletterId = null): array
     {
         return [
             $site_id => $this->em->getRepository("WebEtDesign\NewsletterBundle\Entity\NewsletterLog")->getAnalyticsStats($site_id, $newsletterId)
