@@ -18,8 +18,9 @@ class Configuration implements ConfigurationInterface
 {
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('wd_admin_analytics');
+        $treeBuilder = new TreeBuilder("wd_admin_analytics");
+
+        $rootNode = $treeBuilder->getRootNode();
 
         $rootNode
             ->children()

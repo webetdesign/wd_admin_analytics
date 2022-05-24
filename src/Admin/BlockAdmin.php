@@ -5,18 +5,14 @@ declare(strict_types=1);
 namespace WebEtDesign\AnalyticsBundle\Admin;
 
 use Doctrine\ORM\EntityManagerInterface;
-use FOS\CKEditorBundle\Form\Type\CKEditorType;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
-use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Route\RouteCollection;
-use Sonata\AdminBundle\Show\ShowMapper;
-use Sonata\MediaBundle\Form\Type\MediaType;
+use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -26,20 +22,12 @@ use WebEtDesign\AnalyticsBundle\Enum\BlockTypeEnum;
 
 final class BlockAdmin extends AbstractAdmin
 {
-    /** @var EntityManagerInterface $em */
-    private $em;
-
-    /** @var ContainerInterface $container */
-    private $container;
-
-    public function __construct($code, $class, $baseControllerName = null, EntityManagerInterface $em, ContainerInterface $container)
+    public function __construct($code, $class, $baseControllerName = null, private EntityManagerInterface $em, private ContainerInterface $container)
     {
         parent::__construct($code, $class, $baseControllerName);
-        $this->em = $em;
-        $this->container = $container;
     }
 
-    protected $translationDomain = 'admin';
+    protected string $translationDomain = 'admin';
 
     protected function configureListFields(ListMapper $listMapper): void
     {
@@ -101,7 +89,7 @@ final class BlockAdmin extends AbstractAdmin
         });
     }
 
-    protected function configureRoutes(RouteCollection $collection)
+    protected function configureRoutes(RouteCollectionInterface $collection): void
     {
         parent::configureRoutes($collection);
         $collection->remove('show');

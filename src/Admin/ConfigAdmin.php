@@ -5,42 +5,29 @@ declare(strict_types=1);
 namespace WebEtDesign\AnalyticsBundle\Admin;
 
 use Doctrine\ORM\EntityManagerInterface;
-use FOS\CKEditorBundle\Form\Type\CKEditorType;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
-use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Route\RouteCollection;
-use Sonata\AdminBundle\Show\ShowMapper;
-use Sonata\MediaBundle\Form\Type\MediaType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\ColorType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\Count;
-use Symfony\Component\Validator\Constraints\Regex;
-use Symfony\Component\Validator\Validation;
 use WebEtDesign\AnalyticsBundle\Entity\Config;
-use WebEtDesign\AnalyticsBundle\Enum\BlockStartEnum;
-use WebEtDesign\AnalyticsBundle\Enum\BlockTypeEnum;
 use WebEtDesign\AnalyticsBundle\Enum\ConfigTypeEnum;
 
 final class ConfigAdmin extends AbstractAdmin
 {
-    /** @var EntityManagerInterface $em */
-    private $em;
-
-    public function __construct($code, $class, $baseControllerName = null, EntityManagerInterface $em)
+    public function __construct($code, $class, $baseControllerName = null, private EntityManagerInterface $em)
     {
         parent::__construct($code, $class, $baseControllerName);
-        $this->em = $em;
     }
 
-    protected $translationDomain = 'admin';
+    protected string $translationDomain = 'admin';
 
     protected function configureListFields(ListMapper $listMapper): void
     {
@@ -69,8 +56,8 @@ final class ConfigAdmin extends AbstractAdmin
 
         }
         if ($this->isCurrentRoute('edit')){
-            /** @var ConfigTypeEnum */
-            switch ($this->subject->getCode()){
+            /** @var Config */
+            switch ($this->getSubject()->getCode()){
                 case ConfigTypeEnum::COLORS:
                     $formMapper->add('valueArray', CollectionType::class, [
                         'label' => 'Valeur',
@@ -121,7 +108,7 @@ final class ConfigAdmin extends AbstractAdmin
 
     }
 
-    protected function configureRoutes(RouteCollection $collection)
+    protected function configureRoutes(RouteCollectionInterface $collection): void
     {
         parent::configureRoutes($collection);
         $collection->remove('show');

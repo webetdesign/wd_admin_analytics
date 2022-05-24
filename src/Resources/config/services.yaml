@@ -4,7 +4,6 @@ services:
     autowire: true
     arguments:
       - 'Analytics Data Block'
-      - '@templating'
       - '@analytics_api.service'
       - '@doctrine.orm.default_entity_manager'
       - '@security.helper'
@@ -16,7 +15,6 @@ services:
     class: WebEtDesign\AnalyticsBundle\Block\Config
     arguments:
       - ~
-      - '@templating'
       - '%wd_admin_analytics.map_key%'
       - '%wd_admin_analytics.view_names%'
       - '%wd_admin_analytics.view_ids%'
@@ -26,7 +24,7 @@ services:
       - { name: sonata.block }
 
   analytics_api.api:
-    class:  WebEtDesign\AnalyticsBundle\Service\GoogleAnalyticsService
+    class:  WebEtDesign\AnalyticsBundle\Services\GoogleAnalyticsService
     arguments: ["%google_analytics_api.google_analytics_json_key%"]
     public: true
 
