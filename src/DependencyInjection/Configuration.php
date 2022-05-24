@@ -30,6 +30,7 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->defaultValue([])
                         ->end()
+                        ->scalarNode('google_analytics_json_key')->end()
                         ->arrayNode('view_names')
                             ->scalarPrototype()
                             ->end()

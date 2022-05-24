@@ -15,7 +15,7 @@ use Google_Service_AnalyticsReporting_Metric;
 use Google_Service_AnalyticsReporting_Report as Google_Report;
 use Google_Service_AnalyticsReporting_ReportRequest;
 use Google_Service_AnalyticsReporting_ReportRow;
-use MediaFigaro\GoogleAnalyticsApi\Service\GoogleAnalyticsService;
+use WebEtDesign\AnalyticsBundle\Services\GoogleAnalyticsService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Google_Service_AnalyticsReporting_OrderBy;
 

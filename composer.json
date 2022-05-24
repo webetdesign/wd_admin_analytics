@@ -35,7 +35,7 @@
         "symfony/validator": "^5.4",
         "twig/extensions": "^1.5",
         "twig/twig": "^1.34 || ^2.0",
-        "mediafigaro/google-analytics-api-symfony": "^1.22"
+        "google/apiclient": "^2.0"
     },
     "require-dev": {
         "symfony/class-loader": "^5.4",

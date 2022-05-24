@@ -26,7 +26,7 @@ services:
       - { name: sonata.block }
 
   analytics_api.api:
-    class: MediaFigaro\GoogleAnalyticsApi\Service\GoogleAnalyticsService
+    class:  WebEtDesign\AnalyticsBundle\Service\GoogleAnalyticsService
     arguments: ["%google_analytics_api.google_analytics_json_key%"]
     public: true
 
