@@ -33,12 +33,10 @@
         "symfony/twig-bridge": "^5.4",
         "symfony/twig-bundle": "^5.4",
         "symfony/validator": "^5.4",
-        "twig/extensions": "^1.5",
-        "twig/twig": "^1.34 || ^2.0",
+        "twig/twig": "^3.0.4",
         "google/apiclient": "^2.0"
     },
     "require-dev": {
-        "symfony/class-loader": "^5.4",
         "symfony/filesystem": "^5.4",
         "symfony/phpunit-bridge": "^5.4",
         "symfony/yaml": "^5.4"
